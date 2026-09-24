@@ -1,0 +1,75 @@
+apiVersion: v1
+kind: Namespace
+metadata: {name: sla}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata: {name: accurate, namespace: sla, labels: {app: accurate}}
+spec:
+  replicas: 1
+  selector: {matchLabels: {app: accurate}}
+  template:
+    metadata: {labels: {app: accurate, tier: accurate}}
+    spec:
+      containers:
+        - name: modelserver
+          image: slagw-modelserver:latest
+          imagePullPolicy: Never
+          env:
+            - {name: MODEL_DIR, value: /models/resnet50_v1_fp32}
+            - {name: TIER, value: accurate}
+            - {name: VERSION, value: v1}
+            - {name: ORT_THREADS, value: "2"}
+          ports: [{containerPort: 8000}]
+          resources:
+            requests: {cpu: "1", memory: 512Mi}
+            limits: {cpu: "2", memory: 1Gi}
+          readinessProbe: {httpGet: {path: /readyz, port: 8000}, periodSeconds: 2}
+          livenessProbe: {httpGet: {path: /healthz, port: 8000}, periodSeconds: 10}
+          volumeMounts: [{name: models, mountPath: /models, readOnly: true}]
+      volumes:
+        - name: models
+          hostPath: {path: /project/models/artifacts, type: Directory}
+---
+apiVersion: v1
+kind: Service
+metadata: {name: accurate, namespace: sla}
+spec:
+  selector: {app: accurate}
+  ports: [{port: 8000, targetPort: 8000}]
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata: {name: fast, namespace: sla, labels: {app: fast}}
+spec:
+  replicas: 1
+  selector: {matchLabels: {app: fast}}
+  template:
+    metadata: {labels: {app: fast, tier: fast}}
+    spec:
+      containers:
+        - name: modelserver
+          image: slagw-modelserver:latest
+          imagePullPolicy: Never
+          env:
+            - {name: MODEL_DIR, value: /models/FAST_MODEL}
+            - {name: TIER, value: fast}
+            - {name: VERSION, value: v1}
+            - {name: ORT_THREADS, value: "2"}
+          ports: [{containerPort: 8000}]
+          resources:
+            requests: {cpu: "1", memory: 384Mi}
+            limits: {cpu: "2", memory: 768Mi}
+          readinessProbe: {httpGet: {path: /readyz, port: 8000}, periodSeconds: 2}
+          livenessProbe: {httpGet: {path: /healthz, port: 8000}, periodSeconds: 10}
+          volumeMounts: [{name: models, mountPath: /models, readOnly: true}]
+      volumes:
+        - name: models
+          hostPath: {path: /project/models/artifacts, type: Directory}
+---
+apiVersion: v1
+kind: Service
+metadata: {name: fast, namespace: sla}
+spec:
+  selector: {app: fast}
+  ports: [{port: 8000, targetPort: 8000}]

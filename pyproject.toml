@@ -1,0 +1,10 @@
+[project]
+name = "sla-inference-gateway"
+version = "0.1.0"
+description = "SLA-aware multi-variant model serving: adaptive routing, canary rollouts, autoscaling"
+requires-python = ">=3.11"
+
+[tool.pytest.ini_options]
+pythonpath = ["src", "models"]
+testpaths = ["tests"]
+filterwarnings = ["ignore::DeprecationWarning:fastapi.testclient", "ignore:Using `httpx` with `starlette.testclient`"]

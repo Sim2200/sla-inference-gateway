@@ -1,0 +1,8 @@
+data/
+.cache/
+models/artifacts/
+__pycache__/
+*.pyc
+.venv/
+.pytest_cache/
+results/raw/

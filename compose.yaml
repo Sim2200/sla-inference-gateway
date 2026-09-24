@@ -1,0 +1,72 @@
+# Local stack: two model tiers, the gateway, Prometheus and Grafana.
+#   make up        start it          http://localhost:8080 (gateway)  :9090 (Prometheus)  :3000 (Grafana)
+#   make canary    also start the v2 and faulty model servers used in the canary experiments
+# Each model server gets the same CPU budget (2 cores) so the tiers compare fairly.
+
+x-modelserver: &modelserver
+  build: {context: ., dockerfile: docker/modelserver.Dockerfile}
+  image: slagw-modelserver
+  volumes: ["./models/artifacts:/models:ro"]
+  cpus: 2
+  mem_limit: 1g
+  healthcheck:
+    test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/readyz')"]
+    interval: 2s
+    retries: 30
+
+services:
+  accurate:
+    <<: *modelserver
+    environment: {MODEL_DIR: /models/resnet50_v1_fp32, TIER: accurate, VERSION: v1, ORT_THREADS: 2}
+
+  fast:
+    <<: *modelserver
+    environment: {MODEL_DIR: /models/resnet50_v1_int8, TIER: fast, VERSION: v1, ORT_THREADS: 2}
+
+  accurate-v2:          # canary candidate: newer ResNet-50 weights
+    <<: *modelserver
+    profiles: [canary]
+    environment: {MODEL_DIR: /models/resnet50_v2_fp32, TIER: accurate, VERSION: v2, ORT_THREADS: 2}
+
+  accurate-bad:         # canary candidate with an injected fault: 8% errors and +150 ms
+    <<: *modelserver
+    profiles: [canary]
+    environment: {MODEL_DIR: /models/resnet50_v2_fp32, TIER: accurate, VERSION: v2-faulty, ORT_THREADS: 2,
+                  FAULT_ERROR_RATE: "0.08", FAULT_LATENCY_MS: "150"}
+
+  gateway:
+    build: {context: ., dockerfile: docker/gateway.Dockerfile}
+    image: slagw-gateway
+    ports: ["8080:8080"]
+    cpus: 1.5
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8080/healthz')"]
+      interval: 2s
+      retries: 30
+    depends_on:
+      accurate: {condition: service_healthy}
+      fast: {condition: service_healthy}
+
+  prometheus:
+    image: prom/prometheus:v3.14.0
+    command: ["--config.file=/etc/prometheus/prometheus.yml", "--storage.tsdb.retention.time=2d"]
+    volumes: ["./deploy/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro"]
+    ports: ["9090:9090"]
+
+  grafana:
+    image: grafana/grafana:13.0.9
+    environment:
+      GF_AUTH_ANONYMOUS_ENABLED: "true"
+      GF_AUTH_ANONYMOUS_ORG_ROLE: Admin
+      GF_DASHBOARDS_DEFAULT_HOME_DASHBOARD_PATH: /var/lib/grafana/dashboards/gateway.json
+    volumes:
+      - ./deploy/grafana/provisioning:/etc/grafana/provisioning:ro
+      - ./deploy/grafana/dashboards:/var/lib/grafana/dashboards:ro
+    ports: ["3000:3000"]
+
+  loadgen:              # run with: docker compose run --rm loadgen python loadtest/...
+    build: {context: ., dockerfile: docker/loadgen.Dockerfile}
+    image: slagw-loadgen
+    profiles: [tools]
+    cpus: 2
+    volumes: [".:/work"]
