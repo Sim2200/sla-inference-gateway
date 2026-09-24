@@ -4,7 +4,7 @@ KIND    := kind
 KUBECTL := kubectl
 CLUSTER := sla
 
-.PHONY: setup data models evaluate test up canary down experiments charts \
+.PHONY: setup data models evaluate test up canary down experiments charts coreml \
         k8s-up k8s-hpa k8s-down clean
 
 setup:                ## host venv for the gateway tests
@@ -36,6 +36,11 @@ down:
 experiments:          ## all benchmark experiments (about 1.5 hours)
 	$(COMPOSE) --profile tools build loadgen
 	python3 loadtest/experiments.py all
+
+coreml:               ## Core ML conversion (fp32/fp16/int8) + on-device benchmark (macOS only)
+	uv venv -q -p 3.12 .venv-coreml
+	uv pip install -q -p .venv-coreml/bin/python torch==2.2.2 torchvision==0.17.2 "numpy<2" coremltools pillow
+	.venv-coreml/bin/python models/coreml_bench.py --eval-images 2000 --latency-runs 200
 
 charts:               ## render results/*.json into report/figures
 	$(COMPOSE) run --rm -T loadgen python loadtest/charts.py

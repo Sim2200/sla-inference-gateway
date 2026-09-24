@@ -1,0 +1,92 @@
+{
+  "hardware": "Intel(R) Core(TM) i7-9750H CPU @ 2.60GHz, macOS 26.6.2",
+  "eval_images": 2000,
+  "latency_runs": 200,
+  "coremltools": "9.0",
+  "rows": [
+    {
+      "model": "resnet50_v2",
+      "precision": "fp32",
+      "size_mb": 102.2,
+      "top1": 0.7005,
+      "cpu": {
+        "p50_ms": 85.59,
+        "p95_ms": 89.1
+      },
+      "cpu_gpu": {
+        "p50_ms": 11.48,
+        "p95_ms": 12.28
+      }
+    },
+    {
+      "model": "resnet50_v2",
+      "precision": "fp16",
+      "size_mb": 51.15,
+      "top1": 0.7005,
+      "cpu": {
+        "p50_ms": 91.05,
+        "p95_ms": 95.6
+      },
+      "cpu_gpu": {
+        "p50_ms": 11.83,
+        "p95_ms": 12.76
+      }
+    },
+    {
+      "model": "resnet50_v2",
+      "precision": "int8",
+      "size_mb": 25.72,
+      "top1": 0.704,
+      "cpu": {
+        "p50_ms": 87.99,
+        "p95_ms": 90.56
+      },
+      "cpu_gpu": {
+        "p50_ms": 12.11,
+        "p95_ms": 12.8
+      }
+    },
+    {
+      "model": "mobilenet_v3_large",
+      "precision": "fp32",
+      "size_mb": 22.0,
+      "top1": 0.5975,
+      "cpu": {
+        "p50_ms": 11.95,
+        "p95_ms": 12.41
+      },
+      "cpu_gpu": {
+        "p50_ms": 6.69,
+        "p95_ms": 8.33
+      }
+    },
+    {
+      "model": "mobilenet_v3_large",
+      "precision": "fp16",
+      "size_mb": 11.07,
+      "top1": 0.5975,
+      "cpu": {
+        "p50_ms": 14.28,
+        "p95_ms": 15.71
+      },
+      "cpu_gpu": {
+        "p50_ms": 6.16,
+        "p95_ms": 6.7
+      }
+    },
+    {
+      "model": "mobilenet_v3_large",
+      "precision": "int8",
+      "size_mb": 5.7,
+      "top1": 0.6015,
+      "cpu": {
+        "p50_ms": 14.14,
+        "p95_ms": 15.67
+      },
+      "cpu_gpu": {
+        "p50_ms": 6.12,
+        "p95_ms": 6.56
+      }
+    }
+  ]
+}
