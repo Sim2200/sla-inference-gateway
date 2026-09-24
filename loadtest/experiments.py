@@ -64,8 +64,8 @@ def settle(seconds: float = 8) -> None:
 def capacity() -> dict:
     """Offered load vs p95 for each tier on its own, to find where each saturates."""
     out = {}
-    for mode, rates in (("always_accurate", [4, 6, 8, 10, 12, 14, 16]),
-                        ("always_fast", [8, 12, 16, 20, 24, 28, 32, 36])):
+    for mode, rates in (("always_accurate", [8, 12, 16, 20, 24, 28]),
+                        ("always_fast", [20, 30, 40, 50, 60, 70])):
         out[mode] = []
         for rps in rates:
             set_mode(mode)
@@ -107,13 +107,25 @@ def spike(acc_capacity: float) -> dict:
     return out
 
 
+def recreate_gateway(**env: str) -> None:
+    """Restart the gateway with extra environment (fresh state, original config otherwise)."""
+    subprocess.run(["docker", "compose", "up", "-d", "--no-deps", "--force-recreate", "--wait", "gateway"],
+                   check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, env={**os.environ, **env})
+    wait_ready()
+
+
 def canary(acc_capacity: float) -> dict:
-    """Roll out a healthy v2 and a faulty v2 under steady load; record what the controller did."""
+    """Model upgrade under steady load: stable ResNet-50 v1 int8 -> canary v2 int8.
+
+    Run twice: once with the healthy v2 server, once with a v2 server that has an
+    injected fault (8% errors, +150 ms). The first should be promoted, the second
+    rolled back.
+    """
     rps = round(0.6 * acc_capacity, 1)
     out = {}
-    for name, url in (("resnet50-v2-fp32", "http://accurate-v2:8000"),
-                      ("resnet50-v2-faulty", "http://accurate-bad:8000")):
-        set_mode("sla")
+    for label, name, url in (("healthy", "resnet50-v2-int8", "http://accurate:8000"),
+                             ("faulty", "resnet50-v2-int8-faulty", "http://accurate-bad:8000")):
+        recreate_gateway(ACCURATE_URL="http://accurate-v1:8000", ACCURATE_NAME="resnet50-v1-int8")
         start_after = 15
 
         def start() -> None:
@@ -121,13 +133,11 @@ def canary(acc_capacity: float) -> dict:
             http("POST", "/admin/canary", {"name": name, "url": url})
 
         threading.Thread(target=start, daemon=True).start()
-        s = loadgen(f"{rps}:150", f"canary_{name}", poll=True)
+        s = loadgen(f"{rps}:150", f"canary_{label}", poll=True)
         status = http("GET", "/admin/canary")
-        out[name] = {"summary": s, "rollout": status, "started_at_s": start_after}
-        print(name, status["state"], status["reason"], flush=True)
-        # Put the original stable version back for the next run.
-        subprocess.run(["docker", "compose", "restart", "gateway"], check=True, stdout=subprocess.DEVNULL)
-        wait_ready()
+        out[label] = {"canary": name, "summary": s, "rollout": status, "started_at_s": start_after}
+        print(label, status["state"], status["reason"], flush=True)
+    recreate_gateway()
     Path("results/canary.json").write_text(json.dumps(out, indent=2))
     return out
 
@@ -135,16 +145,10 @@ def canary(acc_capacity: float) -> dict:
 def shadow(acc_capacity: float) -> dict:
     """Mirror 25% of accurate-tier traffic to the fast tier and measure top-1 agreement."""
     rps = round(0.5 * acc_capacity, 1)
-    env = {"SHADOW_FRACTION": "0.25"}
-    subprocess.run(["docker", "compose", "up", "-d", "--no-deps", "--force-recreate", "gateway"],
-                   check=True, stdout=subprocess.DEVNULL, env={**os.environ, **env})
-    wait_ready()
-    set_mode("sla")
+    recreate_gateway(SHADOW_FRACTION="0.25")
     s = loadgen(f"{rps}:120", "shadow", warmup_s=10)
     state = http("GET", "/state")
-    subprocess.run(["docker", "compose", "up", "-d", "--no-deps", "--force-recreate", "gateway"],
-                   check=True, stdout=subprocess.DEVNULL)
-    wait_ready()
+    recreate_gateway()
     agree, disagree = state["shadow"]["agree"], state["shadow"]["disagree"]
     out = {"summary": s["overall"], "agree": agree, "disagree": disagree,
            "agreement": round(agree / max(1, agree + disagree), 4)}

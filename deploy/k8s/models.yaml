@@ -16,9 +16,9 @@ spec:
           image: slagw-modelserver:latest
           imagePullPolicy: Never
           env:
-            - {name: MODEL_DIR, value: /models/resnet50_v1_fp32}
+            - {name: MODEL_DIR, value: /models/resnet50_v2_int8}
             - {name: TIER, value: accurate}
-            - {name: VERSION, value: v1}
+            - {name: VERSION, value: v2}
             - {name: ORT_THREADS, value: "2"}
           ports: [{containerPort: 8000}]
           resources:
@@ -52,7 +52,7 @@ spec:
           image: slagw-modelserver:latest
           imagePullPolicy: Never
           env:
-            - {name: MODEL_DIR, value: /models/FAST_MODEL}
+            - {name: MODEL_DIR, value: /models/mobilenet_v3_large_fp32}
             - {name: TIER, value: fast}
             - {name: VERSION, value: v1}
             - {name: ORT_THREADS, value: "2"}

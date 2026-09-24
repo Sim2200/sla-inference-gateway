@@ -1,15 +1,15 @@
 # Model registry and gateway tuning. Backend URLs can be overridden with
-# ACCURATE_URL / FAST_URL (Kubernetes uses Service DNS names).
+# ACCURATE_URL / FAST_URL and ACCURATE_NAME / FAST_NAME (Kubernetes uses Service DNS names).
 mode: sla                  # sla | always_accurate | always_fast
 request_timeout_s: 5       # per request in sla mode
 baseline_timeout_s: 30     # the naive baselines just wait, like a plain proxy
 
 tiers:
   accurate:
-    target: {name: resnet50-v1-fp32, url: "http://accurate:8000"}
+    target: {name: resnet50-v2-int8, url: "http://accurate:8000"}
     limit: {initial: 4, minimum: 1, maximum: 64}
   fast:
-    target: {name: resnet50-v1-int8, url: "http://fast:8000"}
+    target: {name: mobilenet-v3-large-fp32, url: "http://fast:8000"}
     limit: {initial: 8, minimum: 2, maximum: 128}
 
 controller:

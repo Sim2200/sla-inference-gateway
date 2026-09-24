@@ -1,7 +1,7 @@
 """Gateway configuration: a YAML model registry plus tuning knobs.
 
-Environment variables override the backend URLs, so the same file works in
-Docker Compose and in Kubernetes:  ACCURATE_URL, FAST_URL.
+Environment variables override the backends, so the same file works in Docker
+Compose and in Kubernetes: ACCURATE_URL, FAST_URL, ACCURATE_NAME, FAST_NAME.
 """
 
 from __future__ import annotations
@@ -43,9 +43,10 @@ class GatewayConfig:
     shadow_fraction: float = 0.0
 
 
-def _tier(raw: dict, url_env: str) -> TierConfig:
+def _tier(raw: dict, prefix: str) -> TierConfig:
     target = Target(**raw["target"])
-    target.url = os.environ.get(url_env, target.url)
+    target.url = os.environ.get(f"{prefix}_URL", target.url)
+    target.name = os.environ.get(f"{prefix}_NAME", target.name)
     return TierConfig(target=target, limit=LimitConfig(**raw.get("limit", {})),
                       adaptive=raw.get("adaptive", True))
 
@@ -57,8 +58,8 @@ def load(path: str | Path | None = None) -> GatewayConfig:
     if "stages" in canary:
         canary["stages"] = tuple(canary["stages"])
     return GatewayConfig(
-        accurate=_tier(raw["tiers"]["accurate"], "ACCURATE_URL"),
-        fast=_tier(raw["tiers"]["fast"], "FAST_URL"),
+        accurate=_tier(raw["tiers"]["accurate"], "ACCURATE"),
+        fast=_tier(raw["tiers"]["fast"], "FAST"),
         mode=os.environ.get("GATEWAY_MODE", raw.get("mode", "sla")),
         request_timeout_s=raw.get("request_timeout_s", 5.0),
         baseline_timeout_s=raw.get("baseline_timeout_s", 30.0),

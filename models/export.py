@@ -2,12 +2,13 @@
 
 Candidates
 ----------
-resnet50_v1_fp32        ResNet-50, torchvision IMAGENET1K_V1 weights. The "accurate" tier.
-resnet50_v2_fp32        ResNet-50, IMAGENET1K_V2 weights (newer training recipe). Used
-                        as the new version in the canary rollout experiment.
+resnet50_v1_fp32        ResNet-50, torchvision IMAGENET1K_V1 weights.
+resnet50_v2_fp32        ResNet-50, IMAGENET1K_V2 weights (newer training recipe).
 resnet50_v1_int8        Static int8 quantization of resnet50_v1_fp32.
+resnet50_v2_int8        Static int8 quantization of resnet50_v2_fp32. The "accurate" tier;
+                        resnet50_v1_int8 is the older version in the canary experiment.
 resnet18_int8           Static int8 ResNet-18.
-mobilenet_v3_large_fp32 MobileNetV3-Large, IMAGENET1K_V1.
+mobilenet_v3_large_fp32 MobileNetV3-Large, IMAGENET1K_V1. The "fast" tier.
 mobilenet_v3_large_int8 Static int8 MobileNetV3-Large.
 
 int8 models use ONNX Runtime static quantization (QDQ format, per-channel weights,
@@ -58,6 +59,7 @@ FP32 = {
 INT8 = {
     # name: fp32 source
     "resnet50_v1_int8": "resnet50_v1_fp32",
+    "resnet50_v2_int8": "resnet50_v2_fp32",
     "resnet18_int8": "resnet18_fp32",
     "mobilenet_v3_large_int8": "mobilenet_v3_large_fp32",
 }

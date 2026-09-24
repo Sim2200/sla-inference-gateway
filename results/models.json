@@ -1,0 +1,98 @@
+{
+  "mobilenet_v3_large_fp32": {
+    "arch": "mobilenet_v3_large",
+    "precision": "fp32",
+    "size_mb": 21.92,
+    "params_millions": 5.48,
+    "eval_images": 9500,
+    "top1": 0.6058,
+    "top5": 0.8248,
+    "latency_threads": 2,
+    "latency_ms_p50": 6.65,
+    "latency_ms_p95": 10.51
+  },
+  "mobilenet_v3_large_int8": {
+    "arch": "mobilenet_v3_large",
+    "precision": "int8",
+    "size_mb": 6.0,
+    "params_millions": 5.48,
+    "eval_images": 9500,
+    "top1": 0.5661,
+    "top5": 0.7913,
+    "latency_threads": 2,
+    "latency_ms_p50": 9.15,
+    "latency_ms_p95": 18.68
+  },
+  "resnet18_fp32": {
+    "arch": "resnet18",
+    "precision": "fp32",
+    "size_mb": 46.75,
+    "params_millions": 11.69,
+    "eval_images": 9500,
+    "top1": 0.5751,
+    "top5": 0.8013,
+    "latency_threads": 2,
+    "latency_ms_p50": 28.58,
+    "latency_ms_p95": 36.04
+  },
+  "resnet18_int8": {
+    "arch": "resnet18",
+    "precision": "int8",
+    "size_mb": 11.82,
+    "params_millions": 11.69,
+    "eval_images": 9500,
+    "top1": 0.5724,
+    "top5": 0.7989,
+    "latency_threads": 2,
+    "latency_ms_p50": 19.05,
+    "latency_ms_p95": 32.2
+  },
+  "resnet50_v1_fp32": {
+    "arch": "resnet50",
+    "precision": "fp32",
+    "size_mb": 102.15,
+    "params_millions": 25.56,
+    "eval_images": 9500,
+    "top1": 0.634,
+    "top5": 0.8478,
+    "latency_threads": 2,
+    "latency_ms_p50": 57.3,
+    "latency_ms_p95": 74.15
+  },
+  "resnet50_v1_int8": {
+    "arch": "resnet50",
+    "precision": "int8",
+    "size_mb": 26.08,
+    "params_millions": 25.56,
+    "eval_images": 9500,
+    "top1": 0.6311,
+    "top5": 0.8453,
+    "latency_threads": 2,
+    "latency_ms_p50": 36.12,
+    "latency_ms_p95": 41.58
+  },
+  "resnet50_v2_fp32": {
+    "arch": "resnet50",
+    "precision": "fp32",
+    "size_mb": 102.15,
+    "params_millions": 25.56,
+    "eval_images": 9500,
+    "top1": 0.7008,
+    "top5": 0.8885,
+    "latency_threads": 2,
+    "latency_ms_p50": 62.35,
+    "latency_ms_p95": 89.1
+  },
+  "resnet50_v2_int8": {
+    "arch": "resnet50",
+    "precision": "int8",
+    "size_mb": 26.08,
+    "params_millions": 25.56,
+    "eval_images": 9500,
+    "top1": 0.6877,
+    "top5": 0.8837,
+    "latency_threads": 2,
+    "latency_ms_p50": 36.24,
+    "latency_ms_p95": 42.68
+  }
+}

@@ -197,7 +197,7 @@ def canary() -> None:
         ax_w, ax_e = axes[0][col], axes[1][col]
         ax_w.step([s["t"] for s in states], [100 * s["canary"]["weight"] for s in states], where="post", color=BLUE)
         ax_w.set_ylim(-5, 105)
-        ax_w.set_title(f"{name}: {run['rollout']['state'].replace('_', ' ')}", loc="left", fontsize=10)
+        ax_w.set_title(f"{name} v2 canary: {run['rollout']['state'].replace('_', ' ')}", loc="left", fontsize=10)
         ax_w.set_ylabel("Canary weight (%)" if col == 0 else "")
         r = rows(f"canary_{name}")
         t, err = binned(r, 5, lambda g: 100 * np.mean([x["status"] != 200 for x in g]))

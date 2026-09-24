@@ -27,8 +27,8 @@ test:                 ## unit + integration tests for the gateway (no Docker nee
 up:                   ## gateway :8080, Prometheus :9090, Grafana :3000
 	$(COMPOSE) up -d --build --wait gateway prometheus grafana
 
-canary:               ## also start the canary candidates (healthy v2 and faulty v2)
-	$(COMPOSE) --profile canary up -d --wait accurate-v2 accurate-bad
+canary:               ## also start the servers for the canary experiment (v1 stable, faulty v2)
+	$(COMPOSE) --profile canary up -d --wait accurate-v1 accurate-bad
 
 down:
 	$(COMPOSE) --profile canary --profile tools down
