@@ -1,0 +1,124 @@
+{
+  "always_accurate": [
+    {
+      "rps": 8,
+      "requests": 284,
+      "offered_rps": 8.11,
+      "goodput_rps": 8.11,
+      "p50_ms": 51.4,
+      "p95_ms": 107.0,
+      "p99_ms": 201.2,
+      "within_sla": 1.0,
+      "error_rate": 0.0,
+      "shed_rate": 0.0,
+      "fast_share": 0.0,
+      "top1_accuracy": 0.6549,
+      "p95_runs": [
+        104.0,
+        107.0,
+        111.2
+      ],
+      "within_sla_runs": [
+        0.9965,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "rps": 12,
+      "requests": 422,
+      "offered_rps": 12.06,
+      "goodput_rps": 12.06,
+      "p50_ms": 52.4,
+      "p95_ms": 133.2,
+      "p99_ms": 193.7,
+      "within_sla": 1.0,
+      "error_rate": 0.0,
+      "shed_rate": 0.0,
+      "fast_share": 0.0,
+      "top1_accuracy": 0.7038,
+      "p95_runs": [
+        127.9,
+        133.2,
+        150.2
+      ],
+      "within_sla_runs": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "rps": 14,
+      "requests": 489,
+      "offered_rps": 13.97,
+      "goodput_rps": 13.97,
+      "p50_ms": 55.6,
+      "p95_ms": 149.1,
+      "p99_ms": 201.9,
+      "within_sla": 1.0,
+      "error_rate": 0.0,
+      "shed_rate": 0.0,
+      "fast_share": 0.0,
+      "top1_accuracy": 0.681,
+      "p95_runs": [
+        137.8,
+        149.1,
+        205.1
+      ],
+      "within_sla_runs": [
+        0.998,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "rps": 16,
+      "requests": 560,
+      "offered_rps": 16.0,
+      "goodput_rps": 15.49,
+      "p50_ms": 66.4,
+      "p95_ms": 236.6,
+      "p99_ms": 492.5,
+      "within_sla": 0.9679,
+      "error_rate": 0.0,
+      "shed_rate": 0.0,
+      "fast_share": 0.0,
+      "top1_accuracy": 0.6911,
+      "p95_runs": [
+        219.5,
+        236.6,
+        251.0
+      ],
+      "within_sla_runs": [
+        0.9679,
+        0.9768,
+        0.9875
+      ]
+    },
+    {
+      "rps": 18,
+      "requests": 633,
+      "offered_rps": 18.09,
+      "goodput_rps": 17.57,
+      "p50_ms": 78.4,
+      "p95_ms": 258.3,
+      "p99_ms": 378.9,
+      "within_sla": 0.9716,
+      "error_rate": 0.0,
+      "shed_rate": 0.0,
+      "fast_share": 0.0,
+      "top1_accuracy": 0.6667,
+      "p95_runs": [
+        198.2,
+        258.3,
+        851.6
+      ],
+      "within_sla_runs": [
+        0.5324,
+        0.9716,
+        0.9874
+      ]
+    }
+  ]
+}

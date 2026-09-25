@@ -66,14 +66,17 @@ def settle(seconds: float = 8, timeout: float = 120) -> None:
     probe = next(Path("data/imagenetv2-matched-frequency-format-val/0").glob("*.jpeg")).read_bytes()
     deadline = time.time() + timeout
     while time.time() < deadline:
-        state = http("GET", "/state")
-        if all(t["in_flight"] == 0 for t in state["tiers"].values()):
-            start = time.time()
-            req = urllib.request.Request(GATEWAY + "/predict", data=probe, method="POST")
-            with urllib.request.urlopen(req, timeout=10):
-                pass
-            if time.time() - start < 0.15:
-                return
+        try:
+            state = http("GET", "/state")
+            if all(t["in_flight"] == 0 for t in state["tiers"].values()):
+                start = time.time()
+                req = urllib.request.Request(GATEWAY + "/predict", data=probe, method="POST")
+                with urllib.request.urlopen(req, timeout=10):
+                    pass
+                if time.time() - start < 0.15:
+                    return
+        except (OSError, ValueError):  # gateway busy or still draining: try again
+            pass
         time.sleep(2)
     print("warning: system did not settle", flush=True)
 
@@ -88,8 +91,11 @@ def capacity(modes: tuple[str, ...] = ("always_accurate", "always_fast"), repeat
     path = Path("results/capacity.json")
     out = json.loads(path.read_text()) if path.exists() else {}
     for mode in modes:
-        out[mode] = []
+        out.setdefault(mode, [])
+        done = {point["rps"] for point in out[mode]}
         for rps in rates[mode]:
+            if rps in done:  # resume after an interrupted sweep
+                continue
             runs = []
             for rep in range(repeats):
                 settle()
