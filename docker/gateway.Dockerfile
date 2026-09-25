@@ -3,6 +3,7 @@ COPY requirements-gateway.txt /tmp/
 RUN pip install --no-cache-dir -r /tmp/requirements-gateway.txt
 WORKDIR /app
 COPY src/gateway ./gateway
+COPY src/tracing ./tracing
 COPY deploy/registry.yaml ./registry.yaml
 ENV GATEWAY_CONFIG=/app/registry.yaml PYTHONUNBUFFERED=1
 EXPOSE 8080

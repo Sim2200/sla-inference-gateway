@@ -1,5 +1,5 @@
-# Local stack: two model tiers, the gateway, Prometheus and Grafana.
-#   make up        start it          http://localhost:8080 (gateway)  :9090 (Prometheus)  :3000 (Grafana)
+# Local stack: two model tiers, the gateway, Prometheus, Grafana and Jaeger.
+#   make up        start it          http://localhost:8080 (gateway)  :9090 (Prometheus)  :3000 (Grafana)  :16686 (Jaeger)
 #   make canary    also start the v2 and faulty model servers used in the canary experiments
 # Each model server gets the same CPU budget (2 cores) so the tiers compare fairly.
 
@@ -17,22 +17,22 @@ x-modelserver: &modelserver
 services:
   accurate:             # ResNet-50 (IMAGENET1K_V2 weights), int8
     <<: *modelserver
-    environment: {MODEL_DIR: /models/resnet50_v2_int8, TIER: accurate, VERSION: v2, ORT_THREADS: 2}
+    environment: {MODEL_DIR: /models/resnet50_v2_int8, TIER: accurate, VERSION: v2, ORT_THREADS: 2, OTEL_EXPORTER_OTLP_ENDPOINT: "http://jaeger:4318"}
 
   fast:                 # MobileNetV3-Large, fp32 (int8 made it slower and less accurate)
     <<: *modelserver
-    environment: {MODEL_DIR: /models/mobilenet_v3_large_fp32, TIER: fast, VERSION: v1, ORT_THREADS: 2}
+    environment: {MODEL_DIR: /models/mobilenet_v3_large_fp32, TIER: fast, VERSION: v1, ORT_THREADS: 2, OTEL_EXPORTER_OTLP_ENDPOINT: "http://jaeger:4318"}
 
   accurate-v1:          # canary experiment: the previous version (ResNet-50 V1 weights, int8) as stable
     <<: *modelserver
     profiles: [canary]
-    environment: {MODEL_DIR: /models/resnet50_v1_int8, TIER: accurate, VERSION: v1, ORT_THREADS: 2}
+    environment: {MODEL_DIR: /models/resnet50_v1_int8, TIER: accurate, VERSION: v1, ORT_THREADS: 2, OTEL_EXPORTER_OTLP_ENDPOINT: "http://jaeger:4318"}
 
   accurate-bad:         # canary experiment: v2 with an injected fault, 8% errors and +150 ms
     <<: *modelserver
     profiles: [canary]
     environment: {MODEL_DIR: /models/resnet50_v2_int8, TIER: accurate, VERSION: v2-faulty, ORT_THREADS: 2,
-                  FAULT_ERROR_RATE: "0.08", FAULT_LATENCY_MS: "150"}
+                  FAULT_ERROR_RATE: "0.08", FAULT_LATENCY_MS: "150", OTEL_EXPORTER_OTLP_ENDPOINT: "http://jaeger:4318"}
 
   gateway:
     build: {context: ., dockerfile: docker/gateway.Dockerfile}
@@ -43,6 +43,7 @@ services:
       ACCURATE_URL: ${ACCURATE_URL:-http://accurate:8000}
       ACCURATE_NAME: ${ACCURATE_NAME:-resnet50-v2-int8}
       SHADOW_FRACTION: ${SHADOW_FRACTION:-0}
+      OTEL_EXPORTER_OTLP_ENDPOINT: http://jaeger:4318
     healthcheck:
       test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8080/healthz')"]
       interval: 2s
@@ -67,6 +68,10 @@ services:
       - ./deploy/grafana/provisioning:/etc/grafana/provisioning:ro
       - ./deploy/grafana/dashboards:/var/lib/grafana/dashboards:ro
     ports: ["3000:3000"]
+
+  jaeger:               # traces, received over OTLP; UI at http://localhost:16686
+    image: jaegertracing/all-in-one:1.60
+    ports: ["16686:16686", "4318:4318"]
 
   loadgen:              # run with: docker compose run --rm loadgen python loadtest/...
     build: {context: ., dockerfile: docker/loadgen.Dockerfile}

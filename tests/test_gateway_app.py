@@ -20,8 +20,10 @@ class FakeBackends:
     def __init__(self):
         self.calls = {"accurate": 0, "fast": 0, "canary": 0}
         self.failing = set()
+        self.last_headers = {}
 
     def __call__(self, request: httpx.Request) -> httpx.Response:
+        self.last_headers = dict(request.headers)
         host = request.url.host
         self.calls[host] += 1
         if host in self.failing:

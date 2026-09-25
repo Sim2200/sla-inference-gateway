@@ -5,7 +5,8 @@ POST /predict  image bytes in, prediction out, plus which tier served it and why
 Every second a control loop updates the fast-tier share (SlaController), the
 per-tier concurrency limits (AdaptiveLimit) and any canary rollout. Each
 request is then routed by `routing.decide` using only in-memory state, so the
-gateway adds no extra network calls on the request path.
+gateway adds no extra network calls on the request path. Traces are emitted via
+OpenTelemetry (see `tracing`).
 """
 
 from __future__ import annotations
@@ -17,6 +18,7 @@ from contextlib import asynccontextmanager
 from dataclasses import asdict, dataclass, field
 
 import httpx
+import tracing
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.responses import JSONResponse, Response
 from prometheus_client import CONTENT_TYPE_LATEST, Counter, Gauge, Histogram, generate_latest
@@ -38,6 +40,8 @@ BREAKER = Gauge("gateway_breaker_state", "0 closed, 1 half-open, 2 open", ("targ
 CANARY_WEIGHT = Gauge("gateway_canary_weight", "Share of accurate-tier traffic on the canary")
 TIER_P95 = Gauge("gateway_tier_p95_seconds", "Rolling p95 latency the controller sees", ("tier",))
 SHADOW = Counter("gateway_shadow_total", "Shadow comparisons of fast vs accurate top-1", ("agree",))
+
+TRACER = tracing.tracer("gateway")
 
 
 @dataclass
@@ -85,41 +89,15 @@ class Gateway:
 
     # ---- request path -------------------------------------------------------
 
-    def _tier_view(self, tier: str, now: float) -> TierView:
-        members = [self.stable, self.canary] if tier == ACCURATE else [self.fast]
-        members = [b for b in members if b is not None]
-        limit = self.limits[tier].limit if self.mode == SLA else 10**9
-        return TierView(in_flight=sum(b.in_flight for b in members), max_in_flight=limit,
-                        breaker_allows=any(b.breaker.peek(now) for b in members))
-
-    def _pick_accurate_backend(self) -> Backend:
-        if self.canary is not None and random.random() < self.rollout.weight:
-            return self.canary
-        return self.stable
-
-    async def _call(self, backend: Backend, body: bytes, timeout: float) -> tuple[int, dict]:
-        assert self.client is not None
-        backend.in_flight += 1
-        start = time.monotonic()
-        try:
-            r = await self.client.post(f"{backend.url}/predict", content=body, timeout=timeout)
-            status = r.status_code
-            data = r.json() if r.headers.get("content-type", "").startswith("application/json") else {}
-        except httpx.TimeoutException:
-            status, data = 504, {"detail": "backend timeout"}
-        except httpx.TransportError as exc:
-            status, data = 502, {"detail": f"backend unreachable: {type(exc).__name__}"}
-        finally:
-            backend.in_flight -= 1
-        now = time.monotonic()
-        latency_ms = (now - start) * 1000
-        healthy = status < 500  # a 4xx is the client's fault, not the backend's
-        backend.breaker.record(now, healthy)
-        backend.window.add(now, latency_ms, status == 200)
-        self.tier_windows[backend.tier].add(now, latency_ms, status == 200)
-        return status, data
-
     async def predict(self, body: bytes) -> tuple[int, dict]:
+        with TRACER.start_as_current_span("gateway.route") as span:
+            status, data = await self._predict(body)
+            span.set_attributes({"gateway.mode": self.mode, "gateway.tier": data["routed_to"],
+                                 "gateway.reason": data["reason"], "gateway.target": data.get("target") or "",
+                                 "http.response.status_code": status})
+            return status, data
+
+    async def _predict(self, body: bytes) -> tuple[int, dict]:
         start = time.monotonic()
         acc_view, fast_view = self._tier_view(ACCURATE, start), self._tier_view(FAST, start)
         decision = decide(self.mode, self.controller.fast_share, random.random(), acc_view, fast_view)
@@ -153,6 +131,40 @@ class Gateway:
             self._background.add(task)
             task.add_done_callback(self._background.discard)
         return self._finish(start, backend, reason, status, data)
+
+    def _tier_view(self, tier: str, now: float) -> TierView:
+        members = [self.stable, self.canary] if tier == ACCURATE else [self.fast]
+        members = [b for b in members if b is not None]
+        limit = self.limits[tier].limit if self.mode == SLA else 10**9
+        return TierView(in_flight=sum(b.in_flight for b in members), max_in_flight=limit,
+                        breaker_allows=any(b.breaker.peek(now) for b in members))
+
+    def _pick_accurate_backend(self) -> Backend:
+        if self.canary is not None and random.random() < self.rollout.weight:
+            return self.canary
+        return self.stable
+
+    async def _call(self, backend: Backend, body: bytes, timeout: float) -> tuple[int, dict]:
+        assert self.client is not None
+        backend.in_flight += 1
+        start = time.monotonic()
+        try:
+            r = await self.client.post(f"{backend.url}/predict", content=body, timeout=timeout)
+            status = r.status_code
+            data = r.json() if r.headers.get("content-type", "").startswith("application/json") else {}
+        except httpx.TimeoutException:
+            status, data = 504, {"detail": "backend timeout"}
+        except httpx.TransportError as exc:
+            status, data = 502, {"detail": f"backend unreachable: {type(exc).__name__}"}
+        finally:
+            backend.in_flight -= 1
+        now = time.monotonic()
+        latency_ms = (now - start) * 1000
+        healthy = status < 500  # a 4xx is the client's fault, not the backend's
+        backend.breaker.record(now, healthy)
+        backend.window.add(now, latency_ms, status == 200)
+        self.tier_windows[backend.tier].add(now, latency_ms, status == 200)
+        return status, data
 
     def _finish(self, start: float, backend: Backend | None, reason: str, status: int, data: dict):
         tier = backend.tier if backend else "none"
@@ -253,6 +265,7 @@ def create_app(cfg: config_module.GatewayConfig | None = None,
     async def lifespan(_: FastAPI):
         limits = httpx.Limits(max_connections=512, max_keepalive_connections=128)
         gw.client = httpx.AsyncClient(limits=limits, transport=transport)
+        tracing.instrument_client(gw.client)
 
         async def loop() -> None:
             while True:
@@ -266,6 +279,7 @@ def create_app(cfg: config_module.GatewayConfig | None = None,
         await gw.client.aclose()
 
     app = FastAPI(title="SLA-aware inference gateway", lifespan=lifespan)
+    tracing.instrument_app(app, "gateway")
     app.state.gateway = gw
 
     @app.post("/predict")

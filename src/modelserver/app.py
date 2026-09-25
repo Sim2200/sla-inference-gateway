@@ -7,6 +7,8 @@ each request gets all ORT_THREADS cores); other requests wait in a queue. When
 more than MAX_QUEUE requests are waiting, new ones get 503 right away instead of
 waiting forever. That backpressure is what lets the gateway see overload early.
 
+Spans for queue wait and inference are emitted via OpenTelemetry.
+
 Environment
 -----------
 MODEL_DIR            directory with model.onnx and meta.json            (required)
@@ -32,6 +34,7 @@ from pathlib import Path
 import anyio.to_thread
 import numpy as np
 import onnxruntime as ort
+import tracing
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.responses import Response
 from prometheus_client import CONTENT_TYPE_LATEST, Counter, Gauge, Histogram, generate_latest
@@ -61,12 +64,18 @@ INFERENCE = Histogram("modelserver_inference_seconds", "Preprocess + ONNX Runtim
 IN_FLIGHT = Gauge("modelserver_in_flight", "Requests queued or running", LABELNAMES)
 LABEL_VALUES = (TIER, VERSION, MODEL_NAME)
 
+TRACER = tracing.tracer("modelserver")
+
 
 def _session() -> ort.InferenceSession:
     opts = ort.SessionOptions()
     opts.intra_op_num_threads = ORT_THREADS
     opts.inter_op_num_threads = 1
     opts.graph_optimization_level = ort.GraphOptimizationLevel.ORT_ENABLE_ALL
+    # ORT worker threads busy-wait between ops by default. Under a container CPU limit
+    # that spinning burns the CFS quota, the kernel throttles the whole container for
+    # the rest of the 100 ms period, and p95/p99 latency spikes. Sleep instead.
+    opts.add_session_config_entry("session.intra_op.allow_spinning", "0")
     return ort.InferenceSession(str(MODEL_DIR / "model.onnx"), opts, providers=["CPUExecutionProvider"])
 
 
@@ -90,6 +99,7 @@ async def lifespan(_: FastAPI):
 
 
 app = FastAPI(title=f"model server ({TIER}/{MODEL_NAME})", lifespan=lifespan)
+tracing.instrument_app(app, f"modelserver-{TIER}")
 
 
 def _softmax_top5(logits: np.ndarray) -> list[dict]:
@@ -129,19 +139,23 @@ def _predict_sync(body: bytes) -> dict:
     start = time.perf_counter()
     _enter()
     try:
+        wait = TRACER.start_span("modelserver.queue_wait")
         with SLOTS:
+            wait.end()
             queued = time.perf_counter()
             if FAULT_LATENCY_MS:
                 time.sleep(FAULT_LATENCY_MS / 1000)
             if FAULT_ERROR_RATE and random.random() < FAULT_ERROR_RATE:
                 REQUESTS.labels(*LABEL_VALUES, "error").inc()
                 raise HTTPException(500, "injected fault")
-            try:
-                x = preprocess_bytes(body, META["resize"], META["crop"])
-            except Exception as exc:  # not an image
-                REQUESTS.labels(*LABEL_VALUES, "bad_request").inc()
-                raise HTTPException(400, f"could not decode image: {exc}") from exc
-            logits = SESSION.run(None, {"input": x})[0][0]
+            with TRACER.start_as_current_span("modelserver.inference") as span:
+                span.set_attributes({"model": MODEL_NAME, "tier": TIER, "version": VERSION})
+                try:
+                    x = preprocess_bytes(body, META["resize"], META["crop"])
+                except Exception as exc:  # not an image
+                    REQUESTS.labels(*LABEL_VALUES, "bad_request").inc()
+                    raise HTTPException(400, f"could not decode image: {exc}") from exc
+                logits = SESSION.run(None, {"input": x})[0][0]
             done = time.perf_counter()
         INFERENCE.labels(*LABEL_VALUES).observe(done - queued)
         LATENCY.labels(*LABEL_VALUES).observe(done - start)

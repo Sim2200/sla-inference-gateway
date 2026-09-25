@@ -25,7 +25,8 @@ client ──► gateway ──┬──► accurate tier  (ResNet-50 v2, int8 O
   compared against the stable version on error rate and p95 at each stage, with automatic rollback.
 - **Baselines**: `always_accurate` and `always_fast` modes are plain proxies to one tier, used as the
   comparison in the benchmarks.
-- **Ops**: Prometheus metrics and a Grafana dashboard (`deploy/`), Docker Compose for local runs, and
+- **Ops**: Prometheus metrics and a Grafana dashboard (`deploy/`), OpenTelemetry traces that follow a request from the gateway into
+  the model server (queue wait and inference spans), viewable in Jaeger, Docker Compose for local runs, and
   a kind cluster with an HPA for the autoscaling experiment (`deploy/k8s/`).
 
 ## Choosing the tiers: ONNX model results
@@ -78,7 +79,7 @@ make data          # ImageNetV2 matched-frequency (1.2 GB)
 make models        # export ONNX candidates + int8 variants
 make evaluate      # accuracy + latency table above
 make test          # gateway unit + integration tests (no Docker)
-make up            # gateway :8080, Prometheus :9090, Grafana :3000
+make up            # gateway :8080, Prometheus :9090, Grafana :3000, Jaeger :16686
 make experiments   # load experiments (about 1.5 hours)
 make coreml        # Core ML conversion + on-device benchmark (macOS)
 make k8s-up        # kind cluster with HPA; then make k8s-hpa
