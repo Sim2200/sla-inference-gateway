@@ -119,6 +119,200 @@
         0.9716,
         0.9874
       ]
+    },
+    {
+      "rps": 20,
+      "requests": 711,
+      "offered_rps": 20.31,
+      "goodput_rps": 19.29,
+      "p50_ms": 87.3,
+      "p95_ms": 300.3,
+      "p99_ms": 433.3,
+      "within_sla": 0.9494,
+      "error_rate": 0.0,
+      "shed_rate": 0.0,
+      "fast_share": 0.0,
+      "top1_accuracy": 0.661,
+      "p95_runs": [
+        263.9,
+        300.3,
+        305.3
+      ],
+      "within_sla_runs": [
+        0.948,
+        0.9494,
+        0.9606
+      ]
+    },
+    {
+      "rps": 24,
+      "requests": 856,
+      "offered_rps": 24.46,
+      "goodput_rps": 18.26,
+      "p50_ms": 164.6,
+      "p95_ms": 491.5,
+      "p99_ms": 600.2,
+      "within_sla": 0.7465,
+      "error_rate": 0.0012,
+      "shed_rate": 0.0,
+      "fast_share": 0.0,
+      "top1_accuracy": 0.6737,
+      "p95_runs": [
+        457.4,
+        491.5,
+        773.0
+      ],
+      "within_sla_runs": [
+        0.7465,
+        0.7629,
+        0.8026
+      ]
+    }
+  ],
+  "always_fast": [
+    {
+      "rps": 20,
+      "requests": 711,
+      "offered_rps": 20.31,
+      "goodput_rps": 20.09,
+      "p50_ms": 25.6,
+      "p95_ms": 59.5,
+      "p99_ms": 326.2,
+      "within_sla": 0.9887,
+      "error_rate": 0.0,
+      "shed_rate": 0.0,
+      "fast_share": 1.0,
+      "top1_accuracy": 0.5682,
+      "p95_runs": [
+        57.8,
+        59.5,
+        119.5
+      ],
+      "within_sla_runs": [
+        0.962,
+        0.9887,
+        0.9972
+      ]
+    },
+    {
+      "rps": 30,
+      "requests": 1082,
+      "offered_rps": 30.91,
+      "goodput_rps": 30.91,
+      "p50_ms": 28.0,
+      "p95_ms": 82.7,
+      "p99_ms": 143.2,
+      "within_sla": 1.0,
+      "error_rate": 0.0,
+      "shed_rate": 0.0,
+      "fast_share": 1.0,
+      "top1_accuracy": 0.6017,
+      "p95_runs": [
+        70.3,
+        82.7,
+        87.0
+      ],
+      "within_sla_runs": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "rps": 40,
+      "requests": 1422,
+      "offered_rps": 40.63,
+      "goodput_rps": 40.63,
+      "p50_ms": 31.6,
+      "p95_ms": 83.6,
+      "p99_ms": 140.9,
+      "within_sla": 1.0,
+      "error_rate": 0.0,
+      "shed_rate": 0.0,
+      "fast_share": 1.0,
+      "top1_accuracy": 0.602,
+      "p95_runs": [
+        81.9,
+        83.6,
+        137.5
+      ],
+      "within_sla_runs": [
+        0.9852,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "rps": 50,
+      "requests": 1765,
+      "offered_rps": 50.43,
+      "goodput_rps": 50.43,
+      "p50_ms": 39.3,
+      "p95_ms": 139.4,
+      "p99_ms": 204.2,
+      "within_sla": 1.0,
+      "error_rate": 0.0,
+      "shed_rate": 0.0,
+      "fast_share": 1.0,
+      "top1_accuracy": 0.6011,
+      "p95_runs": [
+        119.4,
+        139.4,
+        149.8
+      ],
+      "within_sla_runs": [
+        0.9989,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "rps": 60,
+      "requests": 2160,
+      "offered_rps": 61.71,
+      "goodput_rps": 57.77,
+      "p50_ms": 77.2,
+      "p95_ms": 315.9,
+      "p99_ms": 387.7,
+      "within_sla": 0.9361,
+      "error_rate": 0.0,
+      "shed_rate": 0.0,
+      "fast_share": 1.0,
+      "top1_accuracy": 0.5958,
+      "p95_runs": [
+        307.4,
+        315.9,
+        359.9
+      ],
+      "within_sla_runs": [
+        0.8625,
+        0.9361,
+        0.9435
+      ]
+    },
+    {
+      "rps": 70,
+      "requests": 2520,
+      "offered_rps": 72.0,
+      "goodput_rps": 0.54,
+      "p50_ms": 924.8,
+      "p95_ms": 1262.9,
+      "p99_ms": 1741.4,
+      "within_sla": 0.0075,
+      "error_rate": 0.121,
+      "shed_rate": 0.0,
+      "fast_share": 1.0,
+      "top1_accuracy": 0.6036,
+      "p95_runs": [
+        1161.3,
+        1262.9,
+        1431.3
+      ],
+      "within_sla_runs": [
+        0.0075,
+        0.0111,
+        0.0119
+      ]
     }
   ]
 }

@@ -30,7 +30,7 @@ canary:
   stages: [0.1, 0.5, 1.0]
   stage_s: 30
   max_stage_s: 180
-  min_requests: 50
+  min_requests: 20         # per version, within the 60 s backend window; at 7 req/s the 10% stage gets ~40
   max_error_delta: 0.02
   max_p95_ratio: 1.25
   p95_slack_ms: 20

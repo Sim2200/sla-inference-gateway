@@ -30,8 +30,9 @@ GATEWAY = "http://localhost:8080"
 RAW = Path("results/raw")
 SLA_MS = 300
 
-# Filled in from the capacity experiment (see README / report); override on the command line.
-ACCURATE_CAPACITY_RPS = 12.0
+# Measured by the capacity experiment: the accurate tier's p95 crosses the 300 ms SLA
+# between 18 and 20 req/s. Override on the command line if the hardware differs.
+ACCURATE_CAPACITY_RPS = 18.0
 
 
 def http(method: str, path: str, payload: dict | None = None) -> dict:

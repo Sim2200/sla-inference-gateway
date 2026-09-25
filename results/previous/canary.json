@@ -1,0 +1,110 @@
+{
+  "healthy": {
+    "canary": "resnet50-v2-int8",
+    "summary": {
+      "profile": "7.2:150",
+      "warmup_s": 0.0,
+      "sla_ms": 300.0,
+      "overall": {
+        "requests": 1103,
+        "offered_rps": 7.35,
+        "goodput_rps": 7.32,
+        "p50_ms": 50.9,
+        "p95_ms": 91.5,
+        "p99_ms": 131.7,
+        "within_sla": 0.9955,
+        "error_rate": 0.0,
+        "shed_rate": 0.0,
+        "fast_share": 0.039,
+        "top1_accuracy": 0.6038
+      },
+      "phases": [
+        {
+          "rps": 7.2,
+          "duration_s": 150.0,
+          "requests": 1103,
+          "offered_rps": 7.35,
+          "goodput_rps": 7.32,
+          "p50_ms": 50.9,
+          "p95_ms": 91.5,
+          "p99_ms": 131.7,
+          "within_sla": 0.9955,
+          "error_rate": 0.0,
+          "shed_rate": 0.0,
+          "fast_share": 0.039,
+          "top1_accuracy": 0.6038
+        }
+      ]
+    },
+    "rollout": {
+      "state": "running",
+      "stage": 0,
+      "weight": 0.1,
+      "reason": "started",
+      "stable": "resnet50-v1-int8",
+      "canary": "resnet50-v2-int8",
+      "history": [
+        {
+          "t": 2551.301999635,
+          "event": "start",
+          "weight": 0.1
+        }
+      ]
+    },
+    "started_at_s": 15
+  },
+  "faulty": {
+    "canary": "resnet50-v2-int8-faulty",
+    "summary": {
+      "profile": "7.2:150",
+      "warmup_s": 0.0,
+      "sla_ms": 300.0,
+      "overall": {
+        "requests": 1103,
+        "offered_rps": 7.35,
+        "goodput_rps": 7.25,
+        "p50_ms": 47.9,
+        "p95_ms": 198.4,
+        "p99_ms": 484.5,
+        "within_sla": 0.9864,
+        "error_rate": 0.0,
+        "shed_rate": 0.0,
+        "fast_share": 0.388,
+        "top1_accuracy": 0.6065
+      },
+      "phases": [
+        {
+          "rps": 7.2,
+          "duration_s": 150.0,
+          "requests": 1103,
+          "offered_rps": 7.35,
+          "goodput_rps": 7.25,
+          "p50_ms": 47.9,
+          "p95_ms": 198.4,
+          "p99_ms": 484.5,
+          "within_sla": 0.9864,
+          "error_rate": 0.0,
+          "shed_rate": 0.0,
+          "fast_share": 0.388,
+          "top1_accuracy": 0.6065
+        }
+      ]
+    },
+    "rollout": {
+      "state": "running",
+      "stage": 0,
+      "weight": 0.1,
+      "reason": "started",
+      "stable": "resnet50-v1-int8",
+      "canary": "resnet50-v2-int8-faulty",
+      "history": [
+        {
+          "t": 2707.671072779,
+          "event": "start",
+          "weight": 0.1
+        }
+      ]
+    },
+    "started_at_s": 15
+  }
+}

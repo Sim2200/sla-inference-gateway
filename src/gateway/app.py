@@ -50,7 +50,7 @@ class Backend:
     url: str
     tier: str
     breaker: CircuitBreaker
-    window: RollingWindow = field(default_factory=lambda: RollingWindow(30.0))
+    window: RollingWindow = field(default_factory=lambda: RollingWindow(60.0))  # canary comparisons
     in_flight: int = 0
 
 

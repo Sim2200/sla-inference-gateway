@@ -1,0 +1,18 @@
+{
+  "summary": {
+    "requests": 667,
+    "offered_rps": 6.06,
+    "goodput_rps": 6.03,
+    "p50_ms": 50.6,
+    "p95_ms": 94.5,
+    "p99_ms": 160.5,
+    "within_sla": 0.994,
+    "error_rate": 0.0,
+    "shed_rate": 0.0,
+    "fast_share": 0.1139,
+    "top1_accuracy": 0.6717
+  },
+  "agree": 93,
+  "disagree": 56,
+  "agreement": 0.6242
+}
