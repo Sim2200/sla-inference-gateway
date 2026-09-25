@@ -19,7 +19,7 @@ services:
     <<: *modelserver
     environment: {MODEL_DIR: /models/resnet50_v2_int8, TIER: accurate, VERSION: v2, ORT_THREADS: 2, OTEL_EXPORTER_OTLP_ENDPOINT: "http://jaeger:4318"}
 
-  fast:                 # MobileNetV3-Large, fp32 (int8 made it slower and less accurate)
+  fast:                 # MobileNetV3-Large, fp32 (int8 was only 1.6 ms faster and 4 points less accurate)
     <<: *modelserver
     environment: {MODEL_DIR: /models/mobilenet_v3_large_fp32, TIER: fast, VERSION: v1, ORT_THREADS: 2, OTEL_EXPORTER_OTLP_ENDPOINT: "http://jaeger:4318"}
 
@@ -44,6 +44,10 @@ services:
       ACCURATE_NAME: ${ACCURATE_NAME:-resnet50-v2-int8}
       SHADOW_FRACTION: ${SHADOW_FRACTION:-0}
       OTEL_EXPORTER_OTLP_ENDPOINT: http://jaeger:4318
+      # Trace 10% of requests (model servers follow the gateway's decision via traceparent),
+      # so tracing costs little CPU during the load experiments.
+      OTEL_TRACES_SAMPLER: parentbased_traceidratio
+      OTEL_TRACES_SAMPLER_ARG: "0.1"
     healthcheck:
       test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8080/healthz')"]
       interval: 2s
