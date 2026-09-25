@@ -35,6 +35,10 @@ def session(path: Path, threads: int) -> ort.InferenceSession:
     opts.intra_op_num_threads = threads
     opts.inter_op_num_threads = 1
     opts.graph_optimization_level = ort.GraphOptimizationLevel.ORT_ENABLE_ALL
+    # ORT worker threads busy-wait between ops by default. Under a container CPU limit
+    # that spinning burns the CFS quota, the kernel throttles the whole container for
+    # the rest of the 100 ms period, and p95/p99 latency spikes. Sleep instead.
+    opts.add_session_config_entry("session.intra_op.allow_spinning", "0")
     return ort.InferenceSession(str(path), opts, providers=["CPUExecutionProvider"])
 
 
@@ -63,7 +67,7 @@ def accuracy(name: str, threads: int, limit: int | None, batch: int = 50) -> dic
     return {"eval_images": n, "top1": round(top1 / n, 4), "top5": round(top5 / n, 4)}
 
 
-def latency(name: str, threads: int, runs: int = 300, warmup: int = 30) -> dict:
+def latency(name: str, threads: int, runs: int = 1000, warmup: int = 50) -> dict:
     sess = session(ARTIFACTS / name / "model.onnx", threads)
     x = np.random.default_rng(0).standard_normal((1, 3, 224, 224)).astype(np.float32)
     for _ in range(warmup):

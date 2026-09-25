@@ -56,24 +56,51 @@ def loadgen(profile: str, out: str, warmup_s: float = 0, poll: bool = False, tim
     return json.loads((RAW / f"{out}.json").read_text())
 
 
-def settle(seconds: float = 8) -> None:
-    """Let queues drain between runs."""
+def settle(seconds: float = 8, timeout: float = 120) -> None:
+    """Wait for queues to drain, then until a probe request comes back fast.
+
+    A laptop has background noise (OS scans, the Docker VM); starting a run while
+    something else is hogging the CPU would record that noise as a result.
+    """
     time.sleep(seconds)
+    probe = next(Path("data/imagenetv2-matched-frequency-format-val/0").glob("*.jpeg")).read_bytes()
+    deadline = time.time() + timeout
+    while time.time() < deadline:
+        state = http("GET", "/state")
+        if all(t["in_flight"] == 0 for t in state["tiers"].values()):
+            start = time.time()
+            req = urllib.request.Request(GATEWAY + "/predict", data=probe, method="POST")
+            with urllib.request.urlopen(req, timeout=10):
+                pass
+            if time.time() - start < 0.15:
+                return
+        time.sleep(2)
+    print("warning: system did not settle", flush=True)
 
 
-def capacity() -> dict:
-    """Offered load vs p95 for each tier on its own, to find where each saturates."""
-    out = {}
-    for mode, rates in (("always_accurate", [8, 12, 16, 20, 24, 28]),
-                        ("always_fast", [20, 30, 40, 50, 60, 70])):
+def capacity(modes: tuple[str, ...] = ("always_accurate", "always_fast"), repeats: int = 3) -> dict:
+    """Offered load vs p95 for each tier on its own, to find where each saturates.
+
+    Each point is run `repeats` times and the median p95 is reported, with the
+    spread kept so the report can show run-to-run noise.
+    """
+    rates = {"always_accurate": [8, 12, 14, 16, 18, 20, 24], "always_fast": [20, 30, 40, 50, 60, 70]}
+    path = Path("results/capacity.json")
+    out = json.loads(path.read_text()) if path.exists() else {}
+    for mode in modes:
         out[mode] = []
-        for rps in rates:
-            set_mode(mode)
-            s = loadgen(f"{rps}:45", f"capacity_{mode}_{rps}", warmup_s=10, timeout=60)["overall"]
-            out[mode].append({"rps": rps, **s})
-            print(mode, rps, s["p95_ms"], s["within_sla"], flush=True)
-            settle()
-    Path("results/capacity.json").write_text(json.dumps(out, indent=2))
+        for rps in rates[mode]:
+            runs = []
+            for rep in range(repeats):
+                settle()
+                set_mode(mode)
+                runs.append(loadgen(f"{rps}:45", f"capacity_{mode}_{rps}_r{rep}", warmup_s=10, timeout=60)["overall"])
+            p95s = sorted(r["p95_ms"] for r in runs)
+            median = runs[[r["p95_ms"] for r in runs].index(p95s[len(p95s) // 2])]
+            out[mode].append({"rps": rps, **median, "p95_runs": p95s,
+                              "within_sla_runs": sorted(r["within_sla"] for r in runs)})
+            print(mode, rps, p95s, flush=True)
+            path.write_text(json.dumps(out, indent=2))
     return out
 
 
@@ -173,9 +200,10 @@ def main() -> None:
     cap = float(sys.argv[2]) if len(sys.argv) > 2 else ACCURATE_CAPACITY_RPS
     RAW.mkdir(parents=True, exist_ok=True)
     wait_ready()
-    steps = {"capacity": lambda: capacity(), "steady": lambda: steady(cap), "spike": lambda: spike(cap),
+    steps = {"capacity": lambda: capacity(), "capacity-accurate": lambda: capacity(("always_accurate",)),
+             "steady": lambda: steady(cap), "spike": lambda: spike(cap),
              "canary": lambda: canary(cap), "shadow": lambda: shadow(cap)}
-    for name in (steps if what == "all" else [what]):
+    for name in (["capacity", "steady", "spike", "canary", "shadow"] if what == "all" else [what]):
         print(f"== {name}", flush=True)
         steps[name]()
 
