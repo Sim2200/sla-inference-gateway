@@ -285,7 +285,33 @@ reveals and a test-set number hides.
 
 ### 6. Kubernetes autoscaling
 
-*Pending: the kind cluster run is in progress and this section is filled in from its results.*
+The same containers on a kind cluster: Deployments for both tiers with CPU-based HPAs (accurate 1–4
+replicas, fast 1–2, target 70% of a 1-CPU request), metrics-server, and the load generator as an
+in-cluster Job. Profile: 60 s normal → **240 s at 45 req/s (2.5× one accurate replica)** → 120 s normal,
+run once with the HPAs removed and replicas pinned to 1, and once with the HPAs on.
+
+![Kubernetes](report/figures/k8s_hpa.png)
+
+| During the 4-minute spike | Gateway, 1 replica per tier | Gateway + HPA |
+|---|---|---|
+| p95 / p99 | 176 / 316 ms | 186 / 273 ms |
+| Within SLA | 98.0% | 98.7% |
+| Shed (503) | 0.9% | 0.6% |
+| Answered by the fast tier | **69%** | **45%** |
+| Top-1 accuracy | 62.4% | **64.2%** |
+| Accurate replicas | 1 | 1 → 2 (90 s) → 3 (195 s) → 4 (250 s) |
+
+The gateway alone already holds the SLA at 2.5× capacity by spilling most traffic to the fast tier.
+What the autoscaler adds is capacity where it matters: as replicas of the accurate tier come up, the
+gateway's adaptive limit grows (5 → 10) and traffic flows back to the accurate model, so a third
+less of the spike is answered by the fast tier and accuracy under the spike rises by 1.8 points. The
+two mechanisms compose without any coordination: the HPA acts on CPU, the gateway on latency.
+
+Two honest notes. The first HPA run hit a 50-second stall unrelated to any scaling event (p95 5.5 s,
+22% errors between 220 s and 270 s) with no pod restarts, evictions or OOM kills; the host was
+swapping again. It is kept in `results/raw/k8s_hpa_run1*`, and the table shows the clean second run.
+And at the very end of the HPA run, scaling *down* a pod that still had requests in flight caused a
+short latency blip: a `preStop` drain hook on the model server is the fix, listed under future work.
 
 ## Engineering findings
 
@@ -331,6 +357,7 @@ shrinks the model but cannot speed up compute.
 | Canary verdicts use error rate and p95 only | Add prediction agreement with the stable version (the shadow machinery already computes it) |
 | CPU only | GPU tiers, batching in the model server (dynamic batching changes the queueing model) |
 | One node (kind) | Multi-node cluster and a cluster-autoscaler experiment |
+| Scale-down can kill a pod with requests in flight | `preStop` hook that stops accepting and drains the queue before the pod exits |
 
 ## Running it
 
