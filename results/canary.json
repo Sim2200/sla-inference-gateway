@@ -1,0 +1,132 @@
+{
+  "healthy": {
+    "canary": "resnet50-v2-int8",
+    "summary": {
+      "profile": "10.8:150",
+      "warmup_s": 0.0,
+      "sla_ms": 300.0,
+      "overall": {
+        "requests": 1665,
+        "offered_rps": 11.1,
+        "goodput_rps": 11.1,
+        "p50_ms": 52.9,
+        "p95_ms": 131.7,
+        "p99_ms": 182.1,
+        "within_sla": 1.0,
+        "error_rate": 0.0,
+        "shed_rate": 0.0,
+        "fast_share": 0.0054,
+        "top1_accuracy": 0.6372
+      },
+      "phases": [
+        {
+          "rps": 10.8,
+          "duration_s": 150.0,
+          "requests": 1665,
+          "offered_rps": 11.1,
+          "goodput_rps": 11.1,
+          "p50_ms": 52.9,
+          "p95_ms": 131.7,
+          "p99_ms": 182.1,
+          "within_sla": 1.0,
+          "error_rate": 0.0,
+          "shed_rate": 0.0,
+          "fast_share": 0.0054,
+          "top1_accuracy": 0.6372
+        }
+      ]
+    },
+    "rollout": {
+      "state": "promoted",
+      "stage": 2,
+      "weight": 0.0,
+      "reason": "all stages healthy",
+      "stable": "resnet50-v2-int8",
+      "canary": null,
+      "history": [
+        {
+          "t": 23953.533969576,
+          "event": "start",
+          "weight": 0.1
+        },
+        {
+          "t": 23983.868686283,
+          "event": "advance",
+          "weight": 0.5
+        },
+        {
+          "t": 24013.888722494,
+          "event": "advance",
+          "weight": 1.0
+        },
+        {
+          "t": 24043.915910907,
+          "event": "promoted",
+          "weight": 0.0,
+          "reason": "all stages healthy"
+        }
+      ]
+    },
+    "started_at_s": 15
+  },
+  "faulty": {
+    "canary": "resnet50-v2-int8-faulty",
+    "summary": {
+      "profile": "10.8:150",
+      "warmup_s": 0.0,
+      "sla_ms": 300.0,
+      "overall": {
+        "requests": 1665,
+        "offered_rps": 11.1,
+        "goodput_rps": 11.07,
+        "p50_ms": 54.6,
+        "p95_ms": 137.6,
+        "p99_ms": 211.4,
+        "within_sla": 0.9976,
+        "error_rate": 0.0,
+        "shed_rate": 0.0,
+        "fast_share": 0.0757,
+        "top1_accuracy": 0.597
+      },
+      "phases": [
+        {
+          "rps": 10.8,
+          "duration_s": 150.0,
+          "requests": 1665,
+          "offered_rps": 11.1,
+          "goodput_rps": 11.07,
+          "p50_ms": 54.6,
+          "p95_ms": 137.6,
+          "p99_ms": 211.4,
+          "within_sla": 0.9976,
+          "error_rate": 0.0,
+          "shed_rate": 0.0,
+          "fast_share": 0.0757,
+          "top1_accuracy": 0.597
+        }
+      ]
+    },
+    "rollout": {
+      "state": "rolled_back",
+      "stage": 0,
+      "weight": 0.0,
+      "reason": "canary error rate 10.0% vs stable 0.0%",
+      "stable": "resnet50-v1-int8",
+      "canary": null,
+      "history": [
+        {
+          "t": 24111.874513111,
+          "event": "start",
+          "weight": 0.1
+        },
+        {
+          "t": 24128.215209779,
+          "event": "rolled_back",
+          "weight": 0.0,
+          "reason": "canary error rate 10.0% vs stable 0.0%"
+        }
+      ]
+    },
+    "started_at_s": 15
+  }
+}

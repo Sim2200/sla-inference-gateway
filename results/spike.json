@@ -1,0 +1,135 @@
+{
+  "profile": "10.8:60,36.0:60,10.8:90",
+  "runs": {
+    "always_accurate": {
+      "profile": "10.8:60,36.0:60,10.8:90",
+      "warmup_s": 0.0,
+      "sla_ms": 300.0,
+      "overall": {
+        "requests": 3859,
+        "offered_rps": 18.38,
+        "goodput_rps": 7.78,
+        "p50_ms": 487.5,
+        "p95_ms": 2597.5,
+        "p99_ms": 2863.9,
+        "within_sla": 0.4232,
+        "error_rate": 0.1451,
+        "shed_rate": 0.0,
+        "fast_share": 0.0,
+        "top1_accuracy": 0.6751
+      },
+      "phases": [
+        {
+          "rps": 10.8,
+          "duration_s": 60.0,
+          "requests": 669,
+          "offered_rps": 11.15,
+          "goodput_rps": 11.15,
+          "p50_ms": 53.5,
+          "p95_ms": 145.2,
+          "p99_ms": 215.0,
+          "within_sla": 1.0,
+          "error_rate": 0.0,
+          "shed_rate": 0.0,
+          "fast_share": 0.0,
+          "top1_accuracy": 0.6801
+        },
+        {
+          "rps": 36.0,
+          "duration_s": 60.0,
+          "requests": 2227,
+          "offered_rps": 37.12,
+          "goodput_rps": 0.47,
+          "p50_ms": 2324.5,
+          "p95_ms": 2751.6,
+          "p99_ms": 2929.9,
+          "within_sla": 0.0126,
+          "error_rate": 0.2515,
+          "shed_rate": 0.0,
+          "fast_share": 0.0,
+          "top1_accuracy": 0.6641
+        },
+        {
+          "rps": 10.8,
+          "duration_s": 90.0,
+          "requests": 963,
+          "offered_rps": 10.7,
+          "goodput_rps": 10.4,
+          "p50_ms": 52.3,
+          "p95_ms": 129.5,
+          "p99_ms": 1748.8,
+          "within_sla": 0.972,
+          "error_rate": 0.0,
+          "shed_rate": 0.0,
+          "fast_share": 0.0,
+          "top1_accuracy": 0.6906
+        }
+      ]
+    },
+    "sla": {
+      "profile": "10.8:60,36.0:60,10.8:90",
+      "warmup_s": 0.0,
+      "sla_ms": 300.0,
+      "overall": {
+        "requests": 3859,
+        "offered_rps": 18.38,
+        "goodput_rps": 18.36,
+        "p50_ms": 57.5,
+        "p95_ms": 172.5,
+        "p99_ms": 231.6,
+        "within_sla": 0.999,
+        "error_rate": 0.0,
+        "shed_rate": 0.0,
+        "fast_share": 0.213,
+        "top1_accuracy": 0.6608
+      },
+      "phases": [
+        {
+          "rps": 10.8,
+          "duration_s": 60.0,
+          "requests": 669,
+          "offered_rps": 11.15,
+          "goodput_rps": 11.15,
+          "p50_ms": 53.3,
+          "p95_ms": 125.4,
+          "p99_ms": 184.6,
+          "within_sla": 1.0,
+          "error_rate": 0.0,
+          "shed_rate": 0.0,
+          "fast_share": 0.012,
+          "top1_accuracy": 0.6786
+        },
+        {
+          "rps": 36.0,
+          "duration_s": 60.0,
+          "requests": 2227,
+          "offered_rps": 37.12,
+          "goodput_rps": 37.05,
+          "p50_ms": 78.9,
+          "p95_ms": 188.2,
+          "p99_ms": 248.3,
+          "within_sla": 0.9982,
+          "error_rate": 0.0,
+          "shed_rate": 0.0,
+          "fast_share": 0.3372,
+          "top1_accuracy": 0.6453
+        },
+        {
+          "rps": 10.8,
+          "duration_s": 90.0,
+          "requests": 963,
+          "offered_rps": 10.7,
+          "goodput_rps": 10.7,
+          "p50_ms": 51.4,
+          "p95_ms": 103.5,
+          "p99_ms": 136.7,
+          "within_sla": 1.0,
+          "error_rate": 0.0,
+          "shed_rate": 0.0,
+          "fast_share": 0.0654,
+          "top1_accuracy": 0.6843
+        }
+      ]
+    }
+  }
+}
