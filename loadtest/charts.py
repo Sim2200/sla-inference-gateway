@@ -136,8 +136,8 @@ def steady() -> None:
     for ax, (key, title, log) in zip(axes, metrics):
         for i, mode in enumerate(modes):
             vals = []
-            for load in loads:
-                v = data["runs"][f"{load}/{mode}"].get(key)
+            for level in loads:
+                v = data["runs"][f"{level}/{mode}"].get(key)
                 vals.append(np.nan if v is None else (v if key == "p95_ms" else v * 100))
             bars = ax.bar(x + (i - 1) * width, vals, width - 0.03, color=COLORS[mode], label=LABELS[mode])
             for b, v in zip(bars, vals):
@@ -145,7 +145,7 @@ def steady() -> None:
                     label = f"{v:,.0f}" if key == "p95_ms" else f"{v:.0f}"
                     ax.annotate(label, (b.get_x() + b.get_width() / 2, b.get_height()), xytext=(0, 2),
                                 textcoords="offset points", ha="center", fontsize=7, color=INK2)
-        ax.set_xticks(x, [f"{l}\n{data['loads_rps'][l]} req/s" for l in loads])
+        ax.set_xticks(x, [f"{level}\n{data['loads_rps'][level]} req/s" for level in loads])
         ax.set_title(title, loc="left", fontsize=10)
         ax.grid(axis="x", visible=False)
         if log:
