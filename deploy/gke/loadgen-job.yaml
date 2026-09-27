@@ -1,0 +1,19 @@
+# In-cluster load generator for GKE. PROFILE and OUT are substituted by loadtest/gke_experiment.py.
+# The container stays alive after the run so the results can be copied out with kubectl cp.
+apiVersion: batch/v1
+kind: Job
+metadata: {name: loadgen, namespace: sla}
+spec:
+  backoffLimit: 0
+  template:
+    spec:
+      restartPolicy: Never
+      containers:
+        - name: loadgen
+          image: us-central1-docker.pkg.dev/project-1adf2361-a5bc-4d4a-a7f/slagw/loadgen:v1
+          workingDir: /work
+          command: ["sh", "-c",
+                    "python loadtest/loadgen.py --url http://gateway.sla.svc.cluster.local:8080 --profile PROFILE --out OUT --poll-state --timeout 60 --replay-dir data/replay --images 2000 && touch OUT.done && sleep 3600"]
+          resources:
+            requests: {cpu: "1", memory: 512Mi}
+            limits: {cpu: "2", memory: 1Gi}

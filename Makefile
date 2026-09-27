@@ -5,7 +5,7 @@ KUBECTL := kubectl
 CLUSTER := sla
 
 .PHONY: setup data models evaluate test up canary down experiments charts coreml \
-        k8s-up k8s-hpa k8s-down clean
+        k8s-up k8s-hpa k8s-down gke-up gke-run gke-down clean
 
 setup:                ## host venv for the gateway tests
 	python3 -m venv .venv && .venv/bin/pip install -r requirements-gateway.txt pytest
@@ -59,6 +59,29 @@ k8s-hpa:              ## autoscaling experiment on the kind cluster
 
 k8s-down:
 	$(KIND) delete cluster --name $(CLUSTER)
+
+GCP_PROJECT ?= your-gcp-project
+GCP_ZONE    ?= us-central1-a
+AR          := us-central1-docker.pkg.dev/$(GCP_PROJECT)/slagw
+
+gke-up:               ## GKE Standard cluster (e2-standard-4, node autoscaling 1-4) + images in Artifact Registry
+	gcloud artifacts repositories create slagw --repository-format=docker --location=us-central1 --project $(GCP_PROJECT) || true
+	gcloud auth configure-docker us-central1-docker.pkg.dev --quiet
+	docker build -t $(AR)/modelserver:v1 -f docker/modelserver.gke.Dockerfile .
+	docker build -t $(AR)/loadgen:v1 -f docker/loadgen.gke.Dockerfile .
+	docker tag slagw-gateway $(AR)/gateway:v1
+	docker push $(AR)/modelserver:v1 && docker push $(AR)/loadgen:v1 && docker push $(AR)/gateway:v1
+	gcloud container clusters create slagw --zone $(GCP_ZONE) --project $(GCP_PROJECT) \
+	  --machine-type e2-standard-4 --num-nodes 2 --enable-autoscaling --min-nodes 1 --max-nodes 4
+	gcloud container clusters get-credentials slagw --zone $(GCP_ZONE) --project $(GCP_PROJECT)
+	sed 's#project-1adf2361-a5bc-4d4a-a7f#$(GCP_PROJECT)#g' deploy/gke/stack.yaml | $(KUBECTL) apply -f -
+	$(KUBECTL) -n sla rollout status deploy/accurate deploy/fast deploy/gateway --timeout=300s
+
+gke-run:              ## the spike experiment on GKE; writes results/gke.json and results/raw/gke_*
+	python3 loadtest/gke_experiment.py
+
+gke-down:             ## delete the cluster (the only thing that costs money while idle)
+	gcloud container clusters delete slagw --zone $(GCP_ZONE) --project $(GCP_PROJECT) --quiet
 
 clean:
 	rm -rf results/raw .pytest_cache

@@ -1,8 +1,16 @@
 data
 .cache
 .venv
+.venv-flink
+.venv-coreml
 .git
 results
 report
 models/artifacts
 **/__pycache__
+# allowed back in for the GKE images (models and a 2,000-image replay set baked in)
+!models/artifacts/labels.json
+!models/artifacts/resnet50_v2_int8
+!models/artifacts/mobilenet_v3_large_fp32
+!models/artifacts/resnet50_v1_int8
+!data/replay

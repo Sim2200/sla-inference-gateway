@@ -246,6 +246,37 @@ def k8s() -> None:
     save(fig, "k8s_hpa.png")
 
 
+def gke() -> None:
+    info = load("gke.json")
+    if not info:
+        return
+    r = rows("gke_hpa_nodes")
+    reps = json.loads((RAW / "gke_hpa_nodes_replicas.json").read_text())
+    fig, axes = plt.subplots(3, 1, figsize=(9, 7.6), sharex=True, height_ratios=[3, 2, 2])
+    t, p95 = binned(r, 10, p95_ok)
+    axes[0].plot(t, p95, color=COLORS["hpa"], label="gateway p95")
+    t, share = binned(r, 10, lambda g: 100 * np.mean([x["tier"] == "fast" for x in g if x["status"] == 200] or [0]))
+    axes[1].plot(t, share, color=COLORS["hpa"])
+    ts = [x["t"] for x in reps]
+    axes[2].step(ts, [x.get("accurate", 0) for x in reps], where="post", color=BLUE, label="accurate replicas")
+    axes[2].step(ts, [x.get("fast", 0) for x in reps], where="post", color=AQUA, label="fast replicas")
+    axes[2].step(ts, [x.get("nodes_ready", 0) for x in reps], where="post", color=INK2, linestyle="--", label="Ready nodes")
+    axes[2].legend(loc="upper right", fontsize=8)
+    sla_line(axes[0])
+    axes[0].set_yscale("log")
+    axes[0].set_ylabel("p95 per 10 s (ms, log)")
+    axes[0].set_title("GKE: pod autoscaler + cluster autoscaler under a 4x spike", loc="left")
+    axes[1].set_ylabel("Answered by fast tier (%)")
+    axes[1].set_ylim(-3, 103)
+    axes[2].set_ylabel("Replicas / nodes")
+    axes[2].set_xlabel("Time (s)")
+    axes[2].set_yticks([1, 2, 3, 4])
+    phases = [float(x.split(":")[1]) for x in info["profile"].split(",")]
+    for ax in axes:
+        ax.axvspan(phases[0], phases[0] + phases[1], color=GRID, alpha=0.5, linewidth=0)
+    save(fig, "gke_autoscaling.png")
+
+
 if __name__ == "__main__":
-    for fn in (models, capacity, steady, spike, canary, k8s):
+    for fn in (models, capacity, steady, spike, canary, k8s, gke):
         fn()

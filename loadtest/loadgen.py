@@ -62,7 +62,14 @@ def arrival_times(profile: list[tuple[float, float]], seed: int) -> list[tuple[f
     return times
 
 
-def load_images(n: int, seed: int) -> list[tuple[bytes, int]]:
+def load_images(n: int, seed: int, replay_dir: str | None = None) -> list[tuple[bytes, int]]:
+    """Real test images with labels: from the full ImageNetV2 split, or from a pre-exported
+    replay folder (labels.json + jpegs) when the dataset is not available (e.g. inside a cluster)."""
+    if replay_dir:
+        d = Path(replay_dir)
+        labels = json.loads((d / "labels.json").read_text())
+        names = sorted(labels)[:n] if n else sorted(labels)
+        return [((d / name).read_bytes(), int(labels[name])) for name in names]
     _, evaluation = split()
     chosen = random.Random(seed).sample(evaluation, n)
     return [(path.read_bytes(), label) for path, label in chosen]
@@ -152,10 +159,11 @@ def main() -> None:
     parser.add_argument("--seed", type=int, default=7)
     parser.add_argument("--warmup-s", type=float, default=0, help="exclude the first N seconds from the summary")
     parser.add_argument("--poll-state", action="store_true", help="record gateway /state every second")
+    parser.add_argument("--replay-dir", default=None, help="folder of jpegs + labels.json to use instead of the dataset")
     args = parser.parse_args()
 
     profile = parse_profile(args.profile)
-    images = load_images(args.images, args.seed)
+    images = load_images(args.images, args.seed, args.replay_dir)
     results, states = asyncio.run(run(args.url, profile, images, args.timeout, args.seed, args.poll_state))
 
     out = Path(args.out)

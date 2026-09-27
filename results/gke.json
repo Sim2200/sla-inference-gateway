@@ -1,0 +1,67 @@
+{
+  "profile": "10.8:60,72.0:360,10.8:180",
+  "capacity_rps": 18.0,
+  "before": {
+    "accurate": 1,
+    "fast": 1,
+    "accurate_cpu_pct": 0,
+    "fast_cpu_pct": 0,
+    "nodes_ready": 2,
+    "nodes_total": 2
+  },
+  "after": {
+    "accurate": 2,
+    "fast": 1,
+    "accurate_cpu_pct": 26,
+    "fast_cpu_pct": 0,
+    "nodes_ready": 3,
+    "nodes_total": 3
+  },
+  "phases": [
+    {
+      "rps": 10.8,
+      "duration_s": 60.0,
+      "requests": 669,
+      "offered_rps": 11.15,
+      "goodput_rps": 11.15,
+      "p50_ms": 53.2,
+      "p95_ms": 138.6,
+      "p99_ms": 176.4,
+      "within_sla": 1.0,
+      "error_rate": 0.0,
+      "shed_rate": 0.0,
+      "fast_share": 0.0149,
+      "top1_accuracy": 0.6771
+    },
+    {
+      "rps": 72.0,
+      "duration_s": 360.0,
+      "requests": 26103,
+      "offered_rps": 72.51,
+      "goodput_rps": 71.07,
+      "p50_ms": 91.0,
+      "p95_ms": 202.2,
+      "p99_ms": 246.2,
+      "within_sla": 0.9801,
+      "error_rate": 0.0174,
+      "shed_rate": 0.0174,
+      "fast_share": 0.7004,
+      "top1_accuracy": 0.6233
+    },
+    {
+      "rps": 10.8,
+      "duration_s": 180.0,
+      "requests": 2019,
+      "offered_rps": 11.22,
+      "goodput_rps": 11.22,
+      "p50_ms": 46.5,
+      "p95_ms": 69.0,
+      "p99_ms": 97.1,
+      "within_sla": 1.0,
+      "error_rate": 0.0,
+      "shed_rate": 0.0,
+      "fast_share": 0.0218,
+      "top1_accuracy": 0.6786
+    }
+  ]
+}

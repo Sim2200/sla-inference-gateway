@@ -10,7 +10,7 @@ By **Simran Kharbanda**
 ![Python](https://img.shields.io/badge/Python-3.12-3776AB?logo=python&logoColor=white)
 ![FastAPI](https://img.shields.io/badge/FastAPI-009688?logo=fastapi&logoColor=white)
 ![ONNX Runtime](https://img.shields.io/badge/ONNX_Runtime-int8-005CED?logo=onnx&logoColor=white)
-![Kubernetes](https://img.shields.io/badge/Kubernetes-kind_%2B_HPA-326CE5?logo=kubernetes&logoColor=white)
+![Kubernetes](https://img.shields.io/badge/Kubernetes-GKE_%2B_HPA-326CE5?logo=kubernetes&logoColor=white)
 ![Prometheus](https://img.shields.io/badge/Prometheus-Grafana-E6522C?logo=prometheus&logoColor=white)
 ![Tests](https://img.shields.io/badge/tests-34_passing-brightgreen)
 
@@ -29,8 +29,8 @@ By **Simran Kharbanda**
 |---|---|
 | **Problem** | A single accurate model is fine at normal load and falls over in a spike: requests queue, p95 blows past the SLA, and eventually they time out. Always using a small fast model avoids that at a permanent accuracy cost. |
 | **Approach** | Two model tiers behind one gateway. A feedback controller watches the accurate tier's rolling p95 and shifts traffic to the fast tier only under pressure, fast to protect and slow to give back. An adaptive concurrency limit spills bursts instantly; circuit breakers, deadline propagation, canary rollouts with automatic rollback, and shadow traffic round it out. |
-| **Stack** | Python 3.12 · FastAPI · httpx · ONNX Runtime (static int8 quantization) · Prometheus + Grafana · OpenTelemetry + Jaeger · Docker Compose · Kubernetes (kind) with HPA · Core ML |
-| **Key results** | At 2× capacity: **p95 2,721 → 192 ms, errors 27% → 0%, requests within SLA 0.4% → 99.8%** vs the naive proxy, with **64.1% top-1 vs 60.0%** for always-fast. A healthy canary was promoted 10→50→100% in 90 s; a faulty one was rolled back in 16 s with **zero client-visible errors**. |
+| **Stack** | Python 3.12 · FastAPI · httpx · ONNX Runtime (static int8 quantization) · Prometheus + Grafana · OpenTelemetry + Jaeger · Docker Compose · Kubernetes (kind and GKE) with HPA + cluster autoscaler · Core ML |
+| **Key results** | At 2× capacity: **p95 2,721 → 192 ms, errors 27% → 0%, requests within SLA 0.4% → 99.8%** vs the naive proxy, with **64.1% top-1 vs 60.0%** for always-fast. A healthy canary was promoted 10→50→100% in 90 s; a faulty one was rolled back in 16 s with **zero client-visible errors**. On GKE, a 6-minute **4× spike stayed 99.8% within SLA** while the HPA and cluster autoscaler added 2 pods and a node in 81 s, cutting shedding 6×. |
 | **Findings** | ONNX Runtime's spinning threads plus a container CPU limit caused CFS throttling: **p95 279 → 74 ms** by turning spinning off. int8 quantization gave ResNet-50 **1.5× lower latency for 0.3–1.3 pt**, and MobileNetV3 **−4 pt for almost nothing**. |
 | **Quality** | 34 tests (all routing rules, controller hysteresis, breaker states, canary verdicts, end-to-end through fake backends), an open-loop load generator that also measures accuracy under load, every result repeated and its spread kept. |
 
@@ -313,6 +313,49 @@ swapping again. It is kept in `results/raw/k8s_hpa_run1*`, and the table shows t
 And at the very end of the HPA run, scaling *down* a pod that still had requests in flight caused a
 short latency blip: a `preStop` drain hook on the model server is the fix, listed under future work.
 
+### 7. On a real cluster: GKE with the cluster autoscaler
+
+The kind experiment can only add pods. On GKE the same manifests (`deploy/gke/`) run on a Standard
+cluster of e2-standard-4 nodes with **node autoscaling 1–4**, images from Artifact Registry with the
+models baked in, and the gateway behind an external load balancer. The spike is bigger and longer
+so that both autoscalers have to act: 60 s normal → **360 s at 72 req/s (4× one accurate replica)**
+→ 180 s normal, open-loop, from an in-cluster load generator.
+
+![GKE](report/figures/gke_autoscaling.png)
+
+| | Normal (60 s) | 4× spike (360 s) | Recovery (180 s) |
+|---|---|---|---|
+| Offered / goodput | 11.2 / 11.2 req/s | 72.5 / 71.1 req/s | 11.2 / 11.2 req/s |
+| p50 / p95 / p99 | 53 / 139 / 176 ms | 91 / 202 / 246 ms | 47 / 69 / 97 ms |
+| Within SLA (of answered) | 100% | 99.8% | 100% |
+| Shed (503) | 0% | 1.7% | 0% |
+| Answered by the fast tier | 1.5% | 70% | 2.2% |
+| Top-1 accuracy | 67.7% | 62.3% | 67.9% |
+
+What happened, from the 5-second samples in `results/raw/gke_hpa_nodes_replicas.json`:
+
+| t (s) | Event |
+|---|---|
+| 60 | Spike starts. Within one 10 s bin the gateway is sending 75% of traffic to the fast tier; p95 stays under 230 ms. |
+| 107 | Fast-tier HPA: 1 → 2 pods. Accurate tier reads 146% of its CPU request. |
+| 127 | Accurate HPA asks for 3 pods; one is Pending (no room on 2 nodes). **Cluster autoscaler adds a third node.** |
+| 134 → 141 | New node Ready, third accurate pod Ready. 81 s from spike start to full capacity, of which ~30 s is the node boot. |
+| 141–420 | Accurate tier sits at 65–69% CPU, just under the 70% target, so the HPA holds at 3. Shed rate falls from 4.7% (before scale-up) to 0.8%. |
+| 420 | Spike ends; p95 drops to ~70 ms within one bin, fast share to 0. |
+| 569 / 583 | After the 120 s scale-down window: fast 2 → 1, accurate 3 → 2. p95 rises by ~20 ms for one bin, versus the multi-second blip seen on kind; the GKE manifests add a 5 s `preStop` sleep so the endpoint is withdrawn before the process is killed. |
+
+Two things worth noticing. First, the request-level and infrastructure-level controls worked at
+their natural time scales: the gateway held the SLA in the first second of the spike, and the
+autoscalers arrived 80 s later with real capacity that cut shedding by 6×. Neither knows about the
+other. Second, a CPU-utilisation HPA at 70% stops scaling exactly when the pods are busy but not
+saturated, which is why the fast tier still answered 68% of the spike after scale-up: the accurate
+tier was at capacity, not over it. Scaling on the gateway's own signal (queue depth or fast-tier
+share, via a custom metric) would add pods until the *accuracy* recovers, not just the CPU. That is
+the obvious next step and is listed under future work.
+
+Cost: the run used a 3-node cluster for about 25 minutes, roughly $0.30 at list price. The cluster
+was deleted afterwards (`make gke-down`); `make gke-up` recreates it in ~5 minutes.
+
 ## Engineering findings
 
 **ONNX Runtime's thread pool spins, and CPU limits punish it.** By default ORT worker threads
@@ -356,8 +399,8 @@ shrinks the model but cannot speed up compute.
 | The controller has fixed thresholds tuned to one SLA | Derive high/low water marks from the SLA and observed service time |
 | Canary verdicts use error rate and p95 only | Add prediction agreement with the stable version (the shadow machinery already computes it) |
 | CPU only | GPU tiers, batching in the model server (dynamic batching changes the queueing model) |
-| One node (kind) | Multi-node cluster and a cluster-autoscaler experiment |
-| Scale-down can kill a pod with requests in flight | `preStop` hook that stops accepting and drains the queue before the pod exits |
+| HPA scales on CPU, which stops just under saturation | Scale on a gateway metric (queue depth or fast-tier share) through a custom-metrics adapter |
+| Scale-down drain is a fixed 5 s `preStop` sleep | A hook that stops accepting and waits for the queue to empty |
 
 ## Running it
 
@@ -373,6 +416,8 @@ make experiments   # capacity, steady, spike, canary, shadow (about 1.5 hours)
 make charts        # results/*.json -> report/figures/*.png
 make k8s-up        # kind cluster, metrics-server, both tiers, HPA, gateway
 make k8s-hpa       # the autoscaling experiment
+make gke-up GCP_PROJECT=<id>   # GKE Standard cluster with node autoscaling, images pushed to Artifact Registry
+make gke-run       # the 4x spike experiment; then `make gke-down` deletes the cluster
 make coreml        # Core ML conversion + on-device benchmark (macOS)
 ```
 
@@ -392,8 +437,8 @@ src/gateway/         routing.py (per-request decision) · controller.py (SLA con
 src/modelserver/     ONNX Runtime FastAPI server, preprocess.py (Pillow + NumPy)
 src/tracing/         OpenTelemetry setup shared by both services
 models/              export.py (ONNX + int8) · evaluate.py · dataset.py · coreml_bench.py
-loadtest/            loadgen.py (open-loop) · experiments.py · k8s_hpa.py · charts.py · locustfile.py
-deploy/              registry.yaml (tiers + tuning) · prometheus/ · grafana/ · k8s/ (kind, HPA, jobs)
+loadtest/            loadgen.py (open-loop) · experiments.py · k8s_hpa.py · gke_experiment.py · charts.py · locustfile.py
+deploy/              registry.yaml (tiers + tuning) · prometheus/ · grafana/ · k8s/ (kind, HPA, jobs) · gke/ (GKE stack + loadgen job)
 docker/              builder, modelserver, gateway, loadgen images
 tests/               34 tests
 results/             every number in this README, plus per-request CSVs under results/raw/
