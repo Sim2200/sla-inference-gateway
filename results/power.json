@@ -1,0 +1,2394 @@
+{
+  "hardware": {
+    "cpu": "Intel(R) Core(TM) i7-9750H CPU @ 2.60GHz",
+    "macos": "26.6.2",
+    "gpus": [
+      "Intel UHD Graphics 630",
+      "AMD Radeon Pro 5300M"
+    ],
+    "coremltools": "9.0",
+    "onnxruntime": "1.20.1"
+  },
+  "method": {
+    "window_s": 20,
+    "idle_s": 10,
+    "repeats": 3,
+    "powermetrics_samplers": "cpu_power,gpu_power",
+    "interval_ms": 500,
+    "input": "random 1x3x224x224 tensor, batch 1",
+    "note": "coreml:resnet50_v2:fp32:cpu was re-measured after the main pass because a stuck process was running during its first idle baseline; all three repeats shown are from the re-measurement"
+  },
+  "rows": [
+    {
+      "label": "coreml:resnet50_v2:fp32:cpu",
+      "runs": [
+        {
+          "repeat": 0,
+          "inferences": 256,
+          "window_s": 20,
+          "throughput_per_s": 12.8,
+          "p50_ms": 75.22,
+          "idle": {
+            "package_w": {
+              "mean": 9.458,
+              "min": 7.02,
+              "max": 15.74,
+              "samples": 30
+            },
+            "gpu_mw": null,
+            "freq_mhz": {
+              "mean": 2552.553,
+              "min": 2311.99,
+              "max": 2810.21,
+              "samples": 30
+            }
+          },
+          "work": {
+            "package_w": {
+              "mean": 57.286,
+              "min": 7.79,
+              "max": 74.63,
+              "samples": 50
+            },
+            "gpu_mw": null,
+            "freq_mhz": {
+              "mean": 3563.667,
+              "min": 2326.88,
+              "max": 3912.69,
+              "samples": 50
+            }
+          },
+          "delta_package_w": 47.828,
+          "mj_per_inference": 3736.56,
+          "package_mj_per_inference_incl_idle": 4475.47
+        },
+        {
+          "repeat": 1,
+          "inferences": 259,
+          "window_s": 20,
+          "throughput_per_s": 12.95,
+          "p50_ms": 74.0,
+          "idle": {
+            "package_w": {
+              "mean": 9.299,
+              "min": 7.27,
+              "max": 13.39,
+              "samples": 30
+            },
+            "gpu_mw": null,
+            "freq_mhz": {
+              "mean": 2538.335,
+              "min": 2299.85,
+              "max": 2850.16,
+              "samples": 30
+            }
+          },
+          "work": {
+            "package_w": {
+              "mean": 57.833,
+              "min": 7.93,
+              "max": 74.53,
+              "samples": 50
+            },
+            "gpu_mw": null,
+            "freq_mhz": {
+              "mean": 3596.098,
+              "min": 2489.14,
+              "max": 3950.17,
+              "samples": 50
+            }
+          },
+          "delta_package_w": 48.534,
+          "mj_per_inference": 3747.8,
+          "package_mj_per_inference_incl_idle": 4465.87
+        },
+        {
+          "repeat": 2,
+          "inferences": 260,
+          "window_s": 20,
+          "throughput_per_s": 13.0,
+          "p50_ms": 74.37,
+          "idle": {
+            "package_w": {
+              "mean": 9.617,
+              "min": 7.76,
+              "max": 14.66,
+              "samples": 30
+            },
+            "gpu_mw": null,
+            "freq_mhz": {
+              "mean": 2625.478,
+              "min": 2456.85,
+              "max": 2852.39,
+              "samples": 30
+            }
+          },
+          "work": {
+            "package_w": {
+              "mean": 58.405,
+              "min": 8.08,
+              "max": 74.8,
+              "samples": 50
+            },
+            "gpu_mw": null,
+            "freq_mhz": {
+              "mean": 3597.89,
+              "min": 2413.08,
+              "max": 3942.93,
+              "samples": 50
+            }
+          },
+          "delta_package_w": 48.788,
+          "mj_per_inference": 3752.92,
+          "package_mj_per_inference_incl_idle": 4492.69
+        }
+      ],
+      "mj_per_inference": {
+        "median": 3747.8,
+        "min": 3736.56,
+        "max": 3752.92
+      },
+      "throughput_per_s": 12.95,
+      "p50_ms": 74.37,
+      "gpu_power_reported": false
+    },
+    {
+      "label": "coreml:resnet50_v2:fp32:cpu_gpu",
+      "runs": [
+        {
+          "repeat": 0,
+          "inferences": 1640,
+          "window_s": 20,
+          "throughput_per_s": 82.0,
+          "p50_ms": 11.16,
+          "idle": {
+            "package_w": {
+              "mean": 9.369,
+              "min": 7.54,
+              "max": 13.66,
+              "samples": 30
+            },
+            "gpu_mw": null,
+            "freq_mhz": {
+              "mean": 2498.571,
+              "min": 2335.95,
+              "max": 2767.91,
+              "samples": 30
+            }
+          },
+          "work": {
+            "package_w": {
+              "mean": 14.327,
+              "min": 7.07,
+              "max": 20.11,
+              "samples": 50
+            },
+            "gpu_mw": null,
+            "freq_mhz": {
+              "mean": 2690.162,
+              "min": 1522.71,
+              "max": 2979.92,
+              "samples": 50
+            }
+          },
+          "delta_package_w": 4.958,
+          "mj_per_inference": 60.46,
+          "package_mj_per_inference_incl_idle": 174.72
+        },
+        {
+          "repeat": 1,
+          "inferences": 1620,
+          "window_s": 20,
+          "throughput_per_s": 81.0,
+          "p50_ms": 11.37,
+          "idle": {
+            "package_w": {
+              "mean": 9.512,
+              "min": 7.21,
+              "max": 18.43,
+              "samples": 30
+            },
+            "gpu_mw": null,
+            "freq_mhz": {
+              "mean": 2514.163,
+              "min": 2285.57,
+              "max": 2875.07,
+              "samples": 30
+            }
+          },
+          "work": {
+            "package_w": {
+              "mean": 13.918,
+              "min": 7.67,
+              "max": 23.01,
+              "samples": 50
+            },
+            "gpu_mw": null,
+            "freq_mhz": {
+              "mean": 2639.473,
+              "min": 1746.29,
+              "max": 3066.44,
+              "samples": 50
+            }
+          },
+          "delta_package_w": 4.406,
+          "mj_per_inference": 54.4,
+          "package_mj_per_inference_incl_idle": 171.83
+        },
+        {
+          "repeat": 2,
+          "inferences": 1604,
+          "window_s": 20,
+          "throughput_per_s": 80.2,
+          "p50_ms": 11.33,
+          "idle": {
+            "package_w": {
+              "mean": 9.249,
+              "min": 7.49,
+              "max": 15.57,
+              "samples": 30
+            },
+            "gpu_mw": null,
+            "freq_mhz": {
+              "mean": 2495.219,
+              "min": 2275.53,
+              "max": 2840.59,
+              "samples": 30
+            }
+          },
+          "work": {
+            "package_w": {
+              "mean": 14.003,
+              "min": 8.01,
+              "max": 20.08,
+              "samples": 50
+            },
+            "gpu_mw": null,
+            "freq_mhz": {
+              "mean": 2658.387,
+              "min": 1515.12,
+              "max": 2944.13,
+              "samples": 50
+            }
+          },
+          "delta_package_w": 4.754,
+          "mj_per_inference": 59.28,
+          "package_mj_per_inference_incl_idle": 174.6
+        }
+      ],
+      "mj_per_inference": {
+        "median": 59.28,
+        "min": 54.4,
+        "max": 60.46
+      },
+      "throughput_per_s": 81.0,
+      "p50_ms": 11.33,
+      "gpu_power_reported": false
+    },
+    {
+      "label": "coreml:resnet50_v2:fp16:cpu",
+      "runs": [
+        {
+          "repeat": 0,
+          "inferences": 251,
+          "window_s": 20,
+          "throughput_per_s": 12.55,
+          "p50_ms": 78.72,
+          "idle": {
+            "package_w": {
+              "mean": 1.364,
+              "min": 0.86,
+              "max": 3.14,
+              "samples": 30
+            },
+            "gpu_mw": null,
+            "freq_mhz": {
+              "mean": 1842.431,
+              "min": 1548.04,
+              "max": 2546.08,
+              "samples": 30
+            }
+          },
+          "work": {
+            "package_w": {
+              "mean": 53.655,
+              "min": 0.98,
+              "max": 69.64,
+              "samples": 50
+            },
+            "gpu_mw": null,
+            "freq_mhz": {
+              "mean": 3598.249,
+              "min": 1738.34,
+              "max": 4013.31,
+              "samples": 50
+            }
+          },
+          "delta_package_w": 52.291,
+          "mj_per_inference": 4166.61,
+          "package_mj_per_inference_incl_idle": 4275.3
+        },
+        {
+          "repeat": 1,
+          "inferences": 255,
+          "window_s": 20,
+          "throughput_per_s": 12.75,
+          "p50_ms": 78.58,
+          "idle": {
+            "package_w": {
+              "mean": 2.016,
+              "min": 0.91,
+              "max": 7.37,
+              "samples": 30
+            },
+            "gpu_mw": null,
+            "freq_mhz": {
+              "mean": 1958.982,
+              "min": 1715.23,
+              "max": 2676.55,
+              "samples": 30
+            }
+          },
+          "work": {
+            "package_w": {
+              "mean": 53.688,
+              "min": 1.0,
+              "max": 70.59,
+              "samples": 50
+            },
+            "gpu_mw": null,
+            "freq_mhz": {
+              "mean": 3599.64,
+              "min": 1758.91,
+              "max": 4013.37,
+              "samples": 50
+            }
+          },
+          "delta_package_w": 51.672,
+          "mj_per_inference": 4052.71,
+          "package_mj_per_inference_incl_idle": 4210.82
+        },
+        {
+          "repeat": 2,
+          "inferences": 253,
+          "window_s": 20,
+          "throughput_per_s": 12.65,
+          "p50_ms": 78.33,
+          "idle": {
+            "package_w": {
+              "mean": 1.088,
+              "min": 0.96,
+              "max": 1.88,
+              "samples": 30
+            },
+            "gpu_mw": null,
+            "freq_mhz": {
+              "mean": 1842.438,
+              "min": 1776.39,
+              "max": 2240.65,
+              "samples": 30
+            }
+          },
+          "work": {
+            "package_w": {
+              "mean": 54.046,
+              "min": 1.1,
+              "max": 70.26,
+              "samples": 50
+            },
+            "gpu_mw": null,
+            "freq_mhz": {
+              "mean": 3591.878,
+              "min": 1624.7,
+              "max": 4011.61,
+              "samples": 50
+            }
+          },
+          "delta_package_w": 52.958,
+          "mj_per_inference": 4186.4,
+          "package_mj_per_inference_incl_idle": 4272.41
+        }
+      ],
+      "mj_per_inference": {
+        "median": 4166.61,
+        "min": 4052.71,
+        "max": 4186.4
+      },
+      "throughput_per_s": 12.65,
+      "p50_ms": 78.58,
+      "gpu_power_reported": false
+    },
+    {
+      "label": "coreml:resnet50_v2:fp16:cpu_gpu",
+      "runs": [
+        {
+          "repeat": 0,
+          "inferences": 1595,
+          "window_s": 20,
+          "throughput_per_s": 79.75,
+          "p50_ms": 12.01,
+          "idle": {
+            "package_w": {
+              "mean": 2.232,
+              "min": 1.01,
+              "max": 5.83,
+              "samples": 30
+            },
+            "gpu_mw": null,
+            "freq_mhz": {
+              "mean": 2043.814,
+              "min": 1752.19,
+              "max": 2570.85,
+              "samples": 30
+            }
+          },
+          "work": {
+            "package_w": {
+              "mean": 5.096,
+              "min": 1.14,
+              "max": 14.72,
+              "samples": 50
+            },
+            "gpu_mw": null,
+            "freq_mhz": {
+              "mean": 1929.022,
+              "min": 1699.16,
+              "max": 3664.48,
+              "samples": 50
+            }
+          },
+          "delta_package_w": 2.864,
+          "mj_per_inference": 35.91,
+          "package_mj_per_inference_incl_idle": 63.9
+        },
+        {
+          "repeat": 1,
+          "inferences": 1598,
+          "window_s": 20,
+          "throughput_per_s": 79.9,
+          "p50_ms": 12.0,
+          "idle": {
+            "package_w": {
+              "mean": 1.273,
+              "min": 0.95,
+              "max": 3.34,
+              "samples": 30
+            },
+            "gpu_mw": null,
+            "freq_mhz": {
+              "mean": 1856.762,
+              "min": 1728.98,
+              "max": 2497.69,
+              "samples": 30
+            }
+          },
+          "work": {
+            "package_w": {
+              "mean": 5.045,
+              "min": 1.36,
+              "max": 10.19,
+              "samples": 50
+            },
+            "gpu_mw": null,
+            "freq_mhz": {
+              "mean": 1907.316,
+              "min": 1433.76,
+              "max": 2613.61,
+              "samples": 50
+            }
+          },
+          "delta_package_w": 3.772,
+          "mj_per_inference": 47.21,
+          "package_mj_per_inference_incl_idle": 63.14
+        },
+        {
+          "repeat": 2,
+          "inferences": 1584,
+          "window_s": 20,
+          "throughput_per_s": 79.2,
+          "p50_ms": 12.0,
+          "idle": {
+            "package_w": {
+              "mean": 1.909,
+              "min": 1.09,
+              "max": 7.89,
+              "samples": 30
+            },
+            "gpu_mw": null,
+            "freq_mhz": {
+              "mean": 1970.797,
+              "min": 1767.67,
+              "max": 2732.36,
+              "samples": 30
+            }
+          },
+          "work": {
+            "package_w": {
+              "mean": 5.446,
+              "min": 1.29,
+              "max": 11.94,
+              "samples": 50
+            },
+            "gpu_mw": null,
+            "freq_mhz": {
+              "mean": 1951.033,
+              "min": 1225.52,
+              "max": 2852.83,
+              "samples": 50
+            }
+          },
+          "delta_package_w": 3.537,
+          "mj_per_inference": 44.66,
+          "package_mj_per_inference_incl_idle": 68.76
+        }
+      ],
+      "mj_per_inference": {
+        "median": 44.66,
+        "min": 35.91,
+        "max": 47.21
+      },
+      "throughput_per_s": 79.75,
+      "p50_ms": 12.0,
+      "gpu_power_reported": false
+    },
+    {
+      "label": "coreml:resnet50_v2:int8:cpu",
+      "runs": [
+        {
+          "repeat": 0,
+          "inferences": 252,
+          "window_s": 20,
+          "throughput_per_s": 12.6,
+          "p50_ms": 78.74,
+          "idle": {
+            "package_w": {
+              "mean": 3.769,
+              "min": 1.52,
+              "max": 11.04,
+              "samples": 30
+            },
+            "gpu_mw": null,
+            "freq_mhz": {
+              "mean": 2185.121,
+              "min": 1879.06,
+              "max": 2714.04,
+              "samples": 30
+            }
+          },
+          "work": {
+            "package_w": {
+              "mean": 54.694,
+              "min": 1.21,
+              "max": 71.73,
+              "samples": 50
+            },
+            "gpu_mw": null,
+            "freq_mhz": {
+              "mean": 3613.361,
+              "min": 1667.12,
+              "max": 4007.59,
+              "samples": 50
+            }
+          },
+          "delta_package_w": 50.925,
+          "mj_per_inference": 4041.67,
+          "package_mj_per_inference_incl_idle": 4340.79
+        },
+        {
+          "repeat": 1,
+          "inferences": 255,
+          "window_s": 20,
+          "throughput_per_s": 12.75,
+          "p50_ms": 78.04,
+          "idle": {
+            "package_w": {
+              "mean": 2.113,
+              "min": 1.23,
+              "max": 5.65,
+              "samples": 30
+            },
+            "gpu_mw": null,
+            "freq_mhz": {
+              "mean": 1951.8,
+              "min": 1732.17,
+              "max": 2533.34,
+              "samples": 30
+            }
+          },
+          "work": {
+            "package_w": {
+              "mean": 54.72,
+              "min": 1.32,
+              "max": 70.25,
+              "samples": 50
+            },
+            "gpu_mw": null,
+            "freq_mhz": {
+              "mean": 3594.666,
+              "min": 1793.28,
+              "max": 4011.33,
+              "samples": 50
+            }
+          },
+          "delta_package_w": 52.607,
+          "mj_per_inference": 4126.04,
+          "package_mj_per_inference_incl_idle": 4291.76
+        },
+        {
+          "repeat": 2,
+          "inferences": 252,
+          "window_s": 20,
+          "throughput_per_s": 12.6,
+          "p50_ms": 78.6,
+          "idle": {
+            "package_w": {
+              "mean": 1.592,
+              "min": 1.25,
+              "max": 2.76,
+              "samples": 30
+            },
+            "gpu_mw": null,
+            "freq_mhz": {
+              "mean": 1991.668,
+              "min": 1820.2,
+              "max": 2358.37,
+              "samples": 30
+            }
+          },
+          "work": {
+            "package_w": {
+              "mean": 54.694,
+              "min": 1.42,
+              "max": 71.05,
+              "samples": 50
+            },
+            "gpu_mw": null,
+            "freq_mhz": {
+              "mean": 3582.958,
+              "min": 1820.05,
+              "max": 4012.52,
+              "samples": 50
+            }
+          },
+          "delta_package_w": 53.102,
+          "mj_per_inference": 4214.44,
+          "package_mj_per_inference_incl_idle": 4340.79
+        }
+      ],
+      "mj_per_inference": {
+        "median": 4126.04,
+        "min": 4041.67,
+        "max": 4214.44
+      },
+      "throughput_per_s": 12.6,
+      "p50_ms": 78.6,
+      "gpu_power_reported": false
+    },
+    {
+      "label": "coreml:resnet50_v2:int8:cpu_gpu",
+      "runs": [
+        {
+          "repeat": 0,
+          "inferences": 1609,
+          "window_s": 20,
+          "throughput_per_s": 80.45,
+          "p50_ms": 11.87,
+          "idle": {
+            "package_w": {
+              "mean": 2.668,
+              "min": 1.34,
+              "max": 6.44,
+              "samples": 30
+            },
+            "gpu_mw": null,
+            "freq_mhz": {
+              "mean": 2081.784,
+              "min": 1806.35,
+              "max": 2615.11,
+              "samples": 30
+            }
+          },
+          "work": {
+            "package_w": {
+              "mean": 6.057,
+              "min": 1.64,
+              "max": 14.18,
+              "samples": 50
+            },
+            "gpu_mw": null,
+            "freq_mhz": {
+              "mean": 2033.181,
+              "min": 1520.6,
+              "max": 3203.71,
+              "samples": 50
+            }
+          },
+          "delta_package_w": 3.389,
+          "mj_per_inference": 42.13,
+          "package_mj_per_inference_incl_idle": 75.29
+        },
+        {
+          "repeat": 1,
+          "inferences": 1612,
+          "window_s": 20,
+          "throughput_per_s": 80.6,
+          "p50_ms": 11.82,
+          "idle": {
+            "package_w": {
+              "mean": 5.754,
+              "min": 1.5,
+              "max": 19.49,
+              "samples": 30
+            },
+            "gpu_mw": null,
+            "freq_mhz": {
+              "mean": 2333.99,
+              "min": 1704.98,
+              "max": 3579.46,
+              "samples": 30
+            }
+          },
+          "work": {
+            "package_w": {
+              "mean": 8.119,
+              "min": 2.93,
+              "max": 21.63,
+              "samples": 50
+            },
+            "gpu_mw": null,
+            "freq_mhz": {
+              "mean": 2265.893,
+              "min": 1891.16,
+              "max": 3470.67,
+              "samples": 50
+            }
+          },
+          "delta_package_w": 2.365,
+          "mj_per_inference": 29.34,
+          "package_mj_per_inference_incl_idle": 100.73
+        },
+        {
+          "repeat": 2,
+          "inferences": 1587,
+          "window_s": 20,
+          "throughput_per_s": 79.35,
+          "p50_ms": 12.05,
+          "idle": {
+            "package_w": {
+              "mean": 3.875,
+              "min": 1.37,
+              "max": 9.97,
+              "samples": 30
+            },
+            "gpu_mw": null,
+            "freq_mhz": {
+              "mean": 2153.746,
+              "min": 1799.79,
+              "max": 2764.47,
+              "samples": 30
+            }
+          },
+          "work": {
+            "package_w": {
+              "mean": 5.259,
+              "min": 1.6,
+              "max": 10.32,
+              "samples": 50
+            },
+            "gpu_mw": null,
+            "freq_mhz": {
+              "mean": 1948.888,
+              "min": 1338.73,
+              "max": 2766.05,
+              "samples": 50
+            }
+          },
+          "delta_package_w": 1.384,
+          "mj_per_inference": 17.44,
+          "package_mj_per_inference_incl_idle": 66.28
+        }
+      ],
+      "mj_per_inference": {
+        "median": 29.34,
+        "min": 17.44,
+        "max": 42.13
+      },
+      "throughput_per_s": 80.45,
+      "p50_ms": 11.87,
+      "gpu_power_reported": false
+    },
+    {
+      "label": "coreml:mobilenet_v3_large:fp32:cpu",
+      "runs": [
+        {
+          "repeat": 0,
+          "inferences": 1857,
+          "window_s": 20,
+          "throughput_per_s": 92.85,
+          "p50_ms": 10.54,
+          "idle": {
+            "package_w": {
+              "mean": 1.587,
+              "min": 1.35,
+              "max": 2.84,
+              "samples": 30
+            },
+            "gpu_mw": null,
+            "freq_mhz": {
+              "mean": 2011.57,
+              "min": 1905.31,
+              "max": 2399.48,
+              "samples": 30
+            }
+          },
+          "work": {
+            "package_w": {
+              "mean": 27.3,
+              "min": 1.47,
+              "max": 35.23,
+              "samples": 50
+            },
+            "gpu_mw": null,
+            "freq_mhz": {
+              "mean": 3139.144,
+              "min": 1891.69,
+              "max": 3420.27,
+              "samples": 50
+            }
+          },
+          "delta_package_w": 25.713,
+          "mj_per_inference": 276.93,
+          "package_mj_per_inference_incl_idle": 294.02
+        },
+        {
+          "repeat": 1,
+          "inferences": 1872,
+          "window_s": 20,
+          "throughput_per_s": 93.6,
+          "p50_ms": 10.5,
+          "idle": {
+            "package_w": {
+              "mean": 2.359,
+              "min": 1.43,
+              "max": 8.96,
+              "samples": 30
+            },
+            "gpu_mw": null,
+            "freq_mhz": {
+              "mean": 2139.652,
+              "min": 1898.98,
+              "max": 2815.32,
+              "samples": 30
+            }
+          },
+          "work": {
+            "package_w": {
+              "mean": 27.373,
+              "min": 1.56,
+              "max": 35.15,
+              "samples": 50
+            },
+            "gpu_mw": null,
+            "freq_mhz": {
+              "mean": 3179.515,
+              "min": 2123.63,
+              "max": 3417.65,
+              "samples": 50
+            }
+          },
+          "delta_package_w": 25.014,
+          "mj_per_inference": 267.24,
+          "package_mj_per_inference_incl_idle": 292.45
+        },
+        {
+          "repeat": 2,
+          "inferences": 1861,
+          "window_s": 20,
+          "throughput_per_s": 93.05,
+          "p50_ms": 10.51,
+          "idle": {
+            "package_w": {
+              "mean": 1.645,
+              "min": 1.46,
+              "max": 2.43,
+              "samples": 30
+            },
+            "gpu_mw": null,
+            "freq_mhz": {
+              "mean": 2094.695,
+              "min": 1931.0,
+              "max": 2305.02,
+              "samples": 30
+            }
+          },
+          "work": {
+            "package_w": {
+              "mean": 27.496,
+              "min": 1.61,
+              "max": 35.02,
+              "samples": 50
+            },
+            "gpu_mw": null,
+            "freq_mhz": {
+              "mean": 3167.993,
+              "min": 2107.98,
+              "max": 3421.34,
+              "samples": 50
+            }
+          },
+          "delta_package_w": 25.851,
+          "mj_per_inference": 277.82,
+          "package_mj_per_inference_incl_idle": 295.5
+        }
+      ],
+      "mj_per_inference": {
+        "median": 276.93,
+        "min": 267.24,
+        "max": 277.82
+      },
+      "throughput_per_s": 93.05,
+      "p50_ms": 10.51,
+      "gpu_power_reported": false
+    },
+    {
+      "label": "coreml:mobilenet_v3_large:fp32:cpu_gpu",
+      "runs": [
+        {
+          "repeat": 0,
+          "inferences": 2366,
+          "window_s": 20,
+          "throughput_per_s": 118.3,
+          "p50_ms": 8.27,
+          "idle": {
+            "package_w": {
+              "mean": 3.11,
+              "min": 1.54,
+              "max": 12.67,
+              "samples": 30
+            },
+            "gpu_mw": null,
+            "freq_mhz": {
+              "mean": 2301.357,
+              "min": 1854.53,
+              "max": 3053.24,
+              "samples": 30
+            }
+          },
+          "work": {
+            "package_w": {
+              "mean": 6.238,
+              "min": 1.87,
+              "max": 11.95,
+              "samples": 50
+            },
+            "gpu_mw": null,
+            "freq_mhz": {
+              "mean": 2119.213,
+              "min": 1197.15,
+              "max": 2914.67,
+              "samples": 50
+            }
+          },
+          "delta_package_w": 3.128,
+          "mj_per_inference": 26.44,
+          "package_mj_per_inference_incl_idle": 52.73
+        },
+        {
+          "repeat": 1,
+          "inferences": 3217,
+          "window_s": 20,
+          "throughput_per_s": 160.85,
+          "p50_ms": 5.44,
+          "idle": {
+            "package_w": {
+              "mean": 1.707,
+              "min": 1.49,
+              "max": 2.51,
+              "samples": 30
+            },
+            "gpu_mw": null,
+            "freq_mhz": {
+              "mean": 2025.939,
+              "min": 1876.86,
+              "max": 2430.33,
+              "samples": 30
+            }
+          },
+          "work": {
+            "package_w": {
+              "mean": 13.932,
+              "min": 6.23,
+              "max": 34.6,
+              "samples": 50
+            },
+            "gpu_mw": null,
+            "freq_mhz": {
+              "mean": 2667.755,
+              "min": 1607.02,
+              "max": 3854.79,
+              "samples": 50
+            }
+          },
+          "delta_package_w": 12.225,
+          "mj_per_inference": 76.0,
+          "package_mj_per_inference_incl_idle": 86.61
+        },
+        {
+          "repeat": 2,
+          "inferences": 2956,
+          "window_s": 20,
+          "throughput_per_s": 147.8,
+          "p50_ms": 6.77,
+          "idle": {
+            "package_w": {
+              "mean": 6.251,
+              "min": 2.89,
+              "max": 28.11,
+              "samples": 30
+            },
+            "gpu_mw": null,
+            "freq_mhz": {
+              "mean": 2016.381,
+              "min": 1603.02,
+              "max": 3331.09,
+              "samples": 30
+            }
+          },
+          "work": {
+            "package_w": {
+              "mean": 8.833,
+              "min": 3.09,
+              "max": 18.36,
+              "samples": 50
+            },
+            "gpu_mw": null,
+            "freq_mhz": {
+              "mean": 2336.824,
+              "min": 1504.63,
+              "max": 3389.63,
+              "samples": 50
+            }
+          },
+          "delta_package_w": 2.582,
+          "mj_per_inference": 17.47,
+          "package_mj_per_inference_incl_idle": 59.76
+        }
+      ],
+      "mj_per_inference": {
+        "median": 26.44,
+        "min": 17.47,
+        "max": 76.0
+      },
+      "throughput_per_s": 147.8,
+      "p50_ms": 6.77,
+      "gpu_power_reported": false
+    },
+    {
+      "label": "coreml:mobilenet_v3_large:fp16:cpu",
+      "runs": [
+        {
+          "repeat": 0,
+          "inferences": 1479,
+          "window_s": 20,
+          "throughput_per_s": 73.95,
+          "p50_ms": 13.03,
+          "idle": {
+            "package_w": {
+              "mean": 2.945,
+              "min": 2.78,
+              "max": 3.49,
+              "samples": 30
+            },
+            "gpu_mw": null,
+            "freq_mhz": {
+              "mean": 2138.629,
+              "min": 1985.78,
+              "max": 2257.94,
+              "samples": 30
+            }
+          },
+          "work": {
+            "package_w": {
+              "mean": 38.709,
+              "min": 2.9,
+              "max": 50.04,
+              "samples": 50
+            },
+            "gpu_mw": null,
+            "freq_mhz": {
+              "mean": 3585.977,
+              "min": 1965.13,
+              "max": 3995.45,
+              "samples": 50
+            }
+          },
+          "delta_package_w": 35.764,
+          "mj_per_inference": 483.62,
+          "package_mj_per_inference_incl_idle": 523.45
+        },
+        {
+          "repeat": 1,
+          "inferences": 1494,
+          "window_s": 20,
+          "throughput_per_s": 74.7,
+          "p50_ms": 13.04,
+          "idle": {
+            "package_w": {
+              "mean": 3.848,
+              "min": 2.81,
+              "max": 7.69,
+              "samples": 30
+            },
+            "gpu_mw": null,
+            "freq_mhz": {
+              "mean": 2253.537,
+              "min": 1821.26,
+              "max": 2661.78,
+              "samples": 30
+            }
+          },
+          "work": {
+            "package_w": {
+              "mean": 39.242,
+              "min": 3.03,
+              "max": 49.83,
+              "samples": 50
+            },
+            "gpu_mw": null,
+            "freq_mhz": {
+              "mean": 3637.398,
+              "min": 2088.1,
+              "max": 3993.96,
+              "samples": 50
+            }
+          },
+          "delta_package_w": 35.394,
+          "mj_per_inference": 473.82,
+          "package_mj_per_inference_incl_idle": 525.33
+        },
+        {
+          "repeat": 2,
+          "inferences": 1484,
+          "window_s": 20,
+          "throughput_per_s": 74.2,
+          "p50_ms": 13.12,
+          "idle": {
+            "package_w": {
+              "mean": 3.099,
+              "min": 2.94,
+              "max": 3.64,
+              "samples": 30
+            },
+            "gpu_mw": null,
+            "freq_mhz": {
+              "mean": 2164.601,
+              "min": 2041.83,
+              "max": 2412.41,
+              "samples": 30
+            }
+          },
+          "work": {
+            "package_w": {
+              "mean": 39.553,
+              "min": 2.94,
+              "max": 50.88,
+              "samples": 50
+            },
+            "gpu_mw": null,
+            "freq_mhz": {
+              "mean": 3570.327,
+              "min": 1810.28,
+              "max": 3991.49,
+              "samples": 50
+            }
+          },
+          "delta_package_w": 36.454,
+          "mj_per_inference": 491.29,
+          "package_mj_per_inference_incl_idle": 533.06
+        }
+      ],
+      "mj_per_inference": {
+        "median": 483.62,
+        "min": 473.82,
+        "max": 491.29
+      },
+      "throughput_per_s": 74.2,
+      "p50_ms": 13.04,
+      "gpu_power_reported": false
+    },
+    {
+      "label": "coreml:mobilenet_v3_large:fp16:cpu_gpu",
+      "runs": [
+        {
+          "repeat": 0,
+          "inferences": 2467,
+          "window_s": 20,
+          "throughput_per_s": 123.35,
+          "p50_ms": 8.17,
+          "idle": {
+            "package_w": {
+              "mean": 3.883,
+              "min": 2.97,
+              "max": 9.65,
+              "samples": 30
+            },
+            "gpu_mw": null,
+            "freq_mhz": {
+              "mean": 2187.243,
+              "min": 1981.31,
+              "max": 2738.29,
+              "samples": 30
+            }
+          },
+          "work": {
+            "package_w": {
+              "mean": 7.99,
+              "min": 3.22,
+              "max": 13.9,
+              "samples": 50
+            },
+            "gpu_mw": null,
+            "freq_mhz": {
+              "mean": 2185.199,
+              "min": 1757.63,
+              "max": 2888.85,
+              "samples": 50
+            }
+          },
+          "delta_package_w": 4.107,
+          "mj_per_inference": 33.3,
+          "package_mj_per_inference_incl_idle": 64.78
+        },
+        {
+          "repeat": 1,
+          "inferences": 2461,
+          "window_s": 20,
+          "throughput_per_s": 123.05,
+          "p50_ms": 8.12,
+          "idle": {
+            "package_w": {
+              "mean": 3.2,
+              "min": 2.98,
+              "max": 3.81,
+              "samples": 30
+            },
+            "gpu_mw": null,
+            "freq_mhz": {
+              "mean": 2144.014,
+              "min": 1927.34,
+              "max": 2280.45,
+              "samples": 30
+            }
+          },
+          "work": {
+            "package_w": {
+              "mean": 8.023,
+              "min": 3.37,
+              "max": 12.79,
+              "samples": 50
+            },
+            "gpu_mw": null,
+            "freq_mhz": {
+              "mean": 2214.525,
+              "min": 1799.34,
+              "max": 2914.16,
+              "samples": 50
+            }
+          },
+          "delta_package_w": 4.823,
+          "mj_per_inference": 39.2,
+          "package_mj_per_inference_incl_idle": 65.2
+        },
+        {
+          "repeat": 2,
+          "inferences": 2477,
+          "window_s": 20,
+          "throughput_per_s": 123.85,
+          "p50_ms": 8.16,
+          "idle": {
+            "package_w": {
+              "mean": 4.168,
+              "min": 2.98,
+              "max": 7.77,
+              "samples": 30
+            },
+            "gpu_mw": null,
+            "freq_mhz": {
+              "mean": 2171.164,
+              "min": 1993.61,
+              "max": 2572.49,
+              "samples": 30
+            }
+          },
+          "work": {
+            "package_w": {
+              "mean": 8.057,
+              "min": 3.31,
+              "max": 16.23,
+              "samples": 50
+            },
+            "gpu_mw": null,
+            "freq_mhz": {
+              "mean": 2202.247,
+              "min": 1897.33,
+              "max": 2841.44,
+              "samples": 50
+            }
+          },
+          "delta_package_w": 3.889,
+          "mj_per_inference": 31.4,
+          "package_mj_per_inference_incl_idle": 65.05
+        }
+      ],
+      "mj_per_inference": {
+        "median": 33.3,
+        "min": 31.4,
+        "max": 39.2
+      },
+      "throughput_per_s": 123.35,
+      "p50_ms": 8.16,
+      "gpu_power_reported": false
+    },
+    {
+      "label": "coreml:mobilenet_v3_large:int8:cpu",
+      "runs": [
+        {
+          "repeat": 0,
+          "inferences": 1502,
+          "window_s": 20,
+          "throughput_per_s": 75.1,
+          "p50_ms": 13.05,
+          "idle": {
+            "package_w": {
+              "mean": 3.49,
+              "min": 2.97,
+              "max": 5.26,
+              "samples": 30
+            },
+            "gpu_mw": null,
+            "freq_mhz": {
+              "mean": 2149.566,
+              "min": 2021.16,
+              "max": 2365.42,
+              "samples": 30
+            }
+          },
+          "work": {
+            "package_w": {
+              "mean": 39.221,
+              "min": 3.22,
+              "max": 50.21,
+              "samples": 50
+            },
+            "gpu_mw": null,
+            "freq_mhz": {
+              "mean": 3653.079,
+              "min": 2098.03,
+              "max": 3996.9,
+              "samples": 50
+            }
+          },
+          "delta_package_w": 35.731,
+          "mj_per_inference": 475.78,
+          "package_mj_per_inference_incl_idle": 522.25
+        },
+        {
+          "repeat": 1,
+          "inferences": 1482,
+          "window_s": 20,
+          "throughput_per_s": 74.1,
+          "p50_ms": 13.08,
+          "idle": {
+            "package_w": {
+              "mean": 3.931,
+              "min": 3.03,
+              "max": 9.94,
+              "samples": 30
+            },
+            "gpu_mw": null,
+            "freq_mhz": {
+              "mean": 2293.234,
+              "min": 2105.13,
+              "max": 2820.94,
+              "samples": 30
+            }
+          },
+          "work": {
+            "package_w": {
+              "mean": 39.663,
+              "min": 3.22,
+              "max": 50.21,
+              "samples": 50
+            },
+            "gpu_mw": null,
+            "freq_mhz": {
+              "mean": 3627.838,
+              "min": 2008.47,
+              "max": 3995.73,
+              "samples": 50
+            }
+          },
+          "delta_package_w": 35.732,
+          "mj_per_inference": 482.21,
+          "package_mj_per_inference_incl_idle": 535.26
+        },
+        {
+          "repeat": 2,
+          "inferences": 1496,
+          "window_s": 20,
+          "throughput_per_s": 74.8,
+          "p50_ms": 13.06,
+          "idle": {
+            "package_w": {
+              "mean": 3.835,
+              "min": 3.32,
+              "max": 6.32,
+              "samples": 30
+            },
+            "gpu_mw": null,
+            "freq_mhz": {
+              "mean": 2366.43,
+              "min": 2207.84,
+              "max": 2736.8,
+              "samples": 30
+            }
+          },
+          "work": {
+            "package_w": {
+              "mean": 40.221,
+              "min": 3.76,
+              "max": 50.53,
+              "samples": 50
+            },
+            "gpu_mw": null,
+            "freq_mhz": {
+              "mean": 3670.844,
+              "min": 2020.85,
+              "max": 3992.22,
+              "samples": 50
+            }
+          },
+          "delta_package_w": 36.386,
+          "mj_per_inference": 486.44,
+          "package_mj_per_inference_incl_idle": 537.71
+        }
+      ],
+      "mj_per_inference": {
+        "median": 482.21,
+        "min": 475.78,
+        "max": 486.44
+      },
+      "throughput_per_s": 74.8,
+      "p50_ms": 13.06,
+      "gpu_power_reported": false
+    },
+    {
+      "label": "coreml:mobilenet_v3_large:int8:cpu_gpu",
+      "runs": [
+        {
+          "repeat": 0,
+          "inferences": 3020,
+          "window_s": 20,
+          "throughput_per_s": 151.0,
+          "p50_ms": 5.95,
+          "idle": {
+            "package_w": {
+              "mean": 7.422,
+              "min": 3.41,
+              "max": 29.9,
+              "samples": 30
+            },
+            "gpu_mw": null,
+            "freq_mhz": {
+              "mean": 2469.462,
+              "min": 2097.27,
+              "max": 3876.99,
+              "samples": 30
+            }
+          },
+          "work": {
+            "package_w": {
+              "mean": 13.688,
+              "min": 3.55,
+              "max": 28.39,
+              "samples": 50
+            },
+            "gpu_mw": null,
+            "freq_mhz": {
+              "mean": 2595.684,
+              "min": 1467.63,
+              "max": 3414.73,
+              "samples": 50
+            }
+          },
+          "delta_package_w": 6.266,
+          "mj_per_inference": 41.5,
+          "package_mj_per_inference_incl_idle": 90.65
+        },
+        {
+          "repeat": 1,
+          "inferences": 2998,
+          "window_s": 20,
+          "throughput_per_s": 149.9,
+          "p50_ms": 5.97,
+          "idle": {
+            "package_w": {
+              "mean": 3.504,
+              "min": 3.22,
+              "max": 4.88,
+              "samples": 30
+            },
+            "gpu_mw": null,
+            "freq_mhz": {
+              "mean": 2088.425,
+              "min": 1948.32,
+              "max": 2422.74,
+              "samples": 30
+            }
+          },
+          "work": {
+            "package_w": {
+              "mean": 10.557,
+              "min": 3.54,
+              "max": 20.5,
+              "samples": 50
+            },
+            "gpu_mw": null,
+            "freq_mhz": {
+              "mean": 2479.999,
+              "min": 1942.45,
+              "max": 3379.65,
+              "samples": 50
+            }
+          },
+          "delta_package_w": 7.053,
+          "mj_per_inference": 47.05,
+          "package_mj_per_inference_incl_idle": 70.43
+        },
+        {
+          "repeat": 2,
+          "inferences": 2857,
+          "window_s": 20,
+          "throughput_per_s": 142.85,
+          "p50_ms": 6.47,
+          "idle": {
+            "package_w": {
+              "mean": 4.61,
+              "min": 3.35,
+              "max": 13.24,
+              "samples": 30
+            },
+            "gpu_mw": null,
+            "freq_mhz": {
+              "mean": 2340.525,
+              "min": 2049.74,
+              "max": 2807.7,
+              "samples": 30
+            }
+          },
+          "work": {
+            "package_w": {
+              "mean": 10.32,
+              "min": 3.75,
+              "max": 19.27,
+              "samples": 50
+            },
+            "gpu_mw": null,
+            "freq_mhz": {
+              "mean": 2531.673,
+              "min": 1974.13,
+              "max": 3424.45,
+              "samples": 50
+            }
+          },
+          "delta_package_w": 5.71,
+          "mj_per_inference": 39.97,
+          "package_mj_per_inference_incl_idle": 72.24
+        }
+      ],
+      "mj_per_inference": {
+        "median": 41.5,
+        "min": 39.97,
+        "max": 47.05
+      },
+      "throughput_per_s": 149.9,
+      "p50_ms": 5.97,
+      "gpu_power_reported": false
+    },
+    {
+      "label": "onnxruntime:resnet50_v2:fp32:cpu4",
+      "runs": [
+        {
+          "repeat": 0,
+          "inferences": 817,
+          "window_s": 20,
+          "throughput_per_s": 40.85,
+          "p50_ms": 23.95,
+          "idle": {
+            "package_w": {
+              "mean": 4.016,
+              "min": 3.32,
+              "max": 10.01,
+              "samples": 30
+            },
+            "gpu_mw": null,
+            "freq_mhz": {
+              "mean": 2282.156,
+              "min": 2119.09,
+              "max": 2955.34,
+              "samples": 30
+            }
+          },
+          "work": {
+            "package_w": {
+              "mean": 55.1,
+              "min": 3.75,
+              "max": 72.54,
+              "samples": 50
+            },
+            "gpu_mw": null,
+            "freq_mhz": {
+              "mean": 3622.616,
+              "min": 2031.53,
+              "max": 4029.23,
+              "samples": 50
+            }
+          },
+          "delta_package_w": 51.084,
+          "mj_per_inference": 1250.53,
+          "package_mj_per_inference_incl_idle": 1348.84
+        },
+        {
+          "repeat": 1,
+          "inferences": 777,
+          "window_s": 20,
+          "throughput_per_s": 38.85,
+          "p50_ms": 24.64,
+          "idle": {
+            "package_w": {
+              "mean": 4.241,
+              "min": 3.6,
+              "max": 11.18,
+              "samples": 30
+            },
+            "gpu_mw": null,
+            "freq_mhz": {
+              "mean": 2447.839,
+              "min": 2307.73,
+              "max": 2847.0,
+              "samples": 30
+            }
+          },
+          "work": {
+            "package_w": {
+              "mean": 53.777,
+              "min": 3.71,
+              "max": 76.0,
+              "samples": 50
+            },
+            "gpu_mw": null,
+            "freq_mhz": {
+              "mean": 3530.655,
+              "min": 2243.82,
+              "max": 4027.6,
+              "samples": 50
+            }
+          },
+          "delta_package_w": 49.536,
+          "mj_per_inference": 1275.06,
+          "package_mj_per_inference_incl_idle": 1384.22
+        },
+        {
+          "repeat": 2,
+          "inferences": 825,
+          "window_s": 20,
+          "throughput_per_s": 41.25,
+          "p50_ms": 24.09,
+          "idle": {
+            "package_w": {
+              "mean": 4.903,
+              "min": 3.46,
+              "max": 11.23,
+              "samples": 30
+            },
+            "gpu_mw": null,
+            "freq_mhz": {
+              "mean": 2308.824,
+              "min": 2089.56,
+              "max": 2688.14,
+              "samples": 30
+            }
+          },
+          "work": {
+            "package_w": {
+              "mean": 55.786,
+              "min": 3.55,
+              "max": 72.12,
+              "samples": 50
+            },
+            "gpu_mw": null,
+            "freq_mhz": {
+              "mean": 3579.353,
+              "min": 1985.76,
+              "max": 4032.33,
+              "samples": 50
+            }
+          },
+          "delta_package_w": 50.883,
+          "mj_per_inference": 1233.53,
+          "package_mj_per_inference_incl_idle": 1352.39
+        }
+      ],
+      "mj_per_inference": {
+        "median": 1250.53,
+        "min": 1233.53,
+        "max": 1275.06
+      },
+      "throughput_per_s": 40.85,
+      "p50_ms": 24.09,
+      "gpu_power_reported": false
+    },
+    {
+      "label": "onnxruntime:resnet50_v2:int8:cpu4",
+      "runs": [
+        {
+          "repeat": 0,
+          "inferences": 1327,
+          "window_s": 20,
+          "throughput_per_s": 66.35,
+          "p50_ms": 14.36,
+          "idle": {
+            "package_w": {
+              "mean": 3.64,
+              "min": 3.43,
+              "max": 4.17,
+              "samples": 30
+            },
+            "gpu_mw": null,
+            "freq_mhz": {
+              "mean": 2223.069,
+              "min": 2113.88,
+              "max": 2380.49,
+              "samples": 30
+            }
+          },
+          "work": {
+            "package_w": {
+              "mean": 56.141,
+              "min": 3.71,
+              "max": 71.76,
+              "samples": 50
+            },
+            "gpu_mw": null,
+            "freq_mhz": {
+              "mean": 3634.235,
+              "min": 1985.77,
+              "max": 4044.02,
+              "samples": 50
+            }
+          },
+          "delta_package_w": 52.501,
+          "mj_per_inference": 791.27,
+          "package_mj_per_inference_incl_idle": 846.13
+        },
+        {
+          "repeat": 1,
+          "inferences": 1338,
+          "window_s": 20,
+          "throughput_per_s": 66.9,
+          "p50_ms": 14.34,
+          "idle": {
+            "package_w": {
+              "mean": 6.001,
+              "min": 3.63,
+              "max": 14.81,
+              "samples": 30
+            },
+            "gpu_mw": null,
+            "freq_mhz": {
+              "mean": 2423.791,
+              "min": 2147.71,
+              "max": 2962.29,
+              "samples": 30
+            }
+          },
+          "work": {
+            "package_w": {
+              "mean": 56.447,
+              "min": 3.7,
+              "max": 72.15,
+              "samples": 50
+            },
+            "gpu_mw": null,
+            "freq_mhz": {
+              "mean": 3644.467,
+              "min": 2090.48,
+              "max": 4040.69,
+              "samples": 50
+            }
+          },
+          "delta_package_w": 50.446,
+          "mj_per_inference": 754.05,
+          "package_mj_per_inference_incl_idle": 843.75
+        },
+        {
+          "repeat": 2,
+          "inferences": 1293,
+          "window_s": 20,
+          "throughput_per_s": 64.65,
+          "p50_ms": 14.48,
+          "idle": {
+            "package_w": {
+              "mean": 4.165,
+              "min": 3.64,
+              "max": 5.48,
+              "samples": 30
+            },
+            "gpu_mw": null,
+            "freq_mhz": {
+              "mean": 2340.865,
+              "min": 2173.04,
+              "max": 2480.26,
+              "samples": 30
+            }
+          },
+          "work": {
+            "package_w": {
+              "mean": 55.707,
+              "min": 3.65,
+              "max": 71.58,
+              "samples": 50
+            },
+            "gpu_mw": null,
+            "freq_mhz": {
+              "mean": 3619.356,
+              "min": 2065.93,
+              "max": 4050.27,
+              "samples": 50
+            }
+          },
+          "delta_package_w": 51.542,
+          "mj_per_inference": 797.25,
+          "package_mj_per_inference_incl_idle": 861.67
+        }
+      ],
+      "mj_per_inference": {
+        "median": 791.27,
+        "min": 754.05,
+        "max": 797.25
+      },
+      "throughput_per_s": 66.35,
+      "p50_ms": 14.36,
+      "gpu_power_reported": false
+    },
+    {
+      "label": "onnxruntime:mobilenet_v3_large:fp32:cpu4",
+      "runs": [
+        {
+          "repeat": 0,
+          "inferences": 3715,
+          "window_s": 20,
+          "throughput_per_s": 185.75,
+          "p50_ms": 5.14,
+          "idle": {
+            "package_w": {
+              "mean": 4.492,
+              "min": 3.58,
+              "max": 8.93,
+              "samples": 30
+            },
+            "gpu_mw": null,
+            "freq_mhz": {
+              "mean": 2294.834,
+              "min": 2126.68,
+              "max": 2691.67,
+              "samples": 30
+            }
+          },
+          "work": {
+            "package_w": {
+              "mean": 31.836,
+              "min": 3.44,
+              "max": 42.2,
+              "samples": 50
+            },
+            "gpu_mw": null,
+            "freq_mhz": {
+              "mean": 3187.463,
+              "min": 1820.33,
+              "max": 3528.85,
+              "samples": 50
+            }
+          },
+          "delta_package_w": 27.344,
+          "mj_per_inference": 147.21,
+          "package_mj_per_inference_incl_idle": 171.39
+        },
+        {
+          "repeat": 1,
+          "inferences": 3831,
+          "window_s": 20,
+          "throughput_per_s": 191.55,
+          "p50_ms": 5.07,
+          "idle": {
+            "package_w": {
+              "mean": 3.6,
+              "min": 3.34,
+              "max": 4.87,
+              "samples": 30
+            },
+            "gpu_mw": null,
+            "freq_mhz": {
+              "mean": 2051.757,
+              "min": 1892.4,
+              "max": 2299.87,
+              "samples": 30
+            }
+          },
+          "work": {
+            "package_w": {
+              "mean": 32.584,
+              "min": 3.57,
+              "max": 41.73,
+              "samples": 50
+            },
+            "gpu_mw": null,
+            "freq_mhz": {
+              "mean": 3194.039,
+              "min": 1942.95,
+              "max": 3499.69,
+              "samples": 50
+            }
+          },
+          "delta_package_w": 28.984,
+          "mj_per_inference": 151.31,
+          "package_mj_per_inference_incl_idle": 170.11
+        },
+        {
+          "repeat": 2,
+          "inferences": 3913,
+          "window_s": 20,
+          "throughput_per_s": 195.65,
+          "p50_ms": 5.04,
+          "idle": {
+            "package_w": {
+              "mean": 4.872,
+              "min": 3.65,
+              "max": 12.07,
+              "samples": 30
+            },
+            "gpu_mw": null,
+            "freq_mhz": {
+              "mean": 2266.791,
+              "min": 1993.88,
+              "max": 2737.93,
+              "samples": 30
+            }
+          },
+          "work": {
+            "package_w": {
+              "mean": 32.941,
+              "min": 3.6,
+              "max": 41.85,
+              "samples": 50
+            },
+            "gpu_mw": null,
+            "freq_mhz": {
+              "mean": 3213.406,
+              "min": 1938.15,
+              "max": 3499.72,
+              "samples": 50
+            }
+          },
+          "delta_package_w": 28.069,
+          "mj_per_inference": 143.47,
+          "package_mj_per_inference_incl_idle": 168.37
+        }
+      ],
+      "mj_per_inference": {
+        "median": 147.21,
+        "min": 143.47,
+        "max": 151.31
+      },
+      "throughput_per_s": 191.55,
+      "p50_ms": 5.07,
+      "gpu_power_reported": false
+    },
+    {
+      "label": "onnxruntime:mobilenet_v3_large:int8:cpu4",
+      "runs": [
+        {
+          "repeat": 0,
+          "inferences": 4433,
+          "window_s": 20,
+          "throughput_per_s": 221.65,
+          "p50_ms": 4.16,
+          "idle": {
+            "package_w": {
+              "mean": 5.088,
+              "min": 3.69,
+              "max": 10.14,
+              "samples": 30
+            },
+            "gpu_mw": null,
+            "freq_mhz": {
+              "mean": 2377.235,
+              "min": 2103.47,
+              "max": 2854.67,
+              "samples": 30
+            }
+          },
+          "work": {
+            "package_w": {
+              "mean": 40.784,
+              "min": 3.78,
+              "max": 51.8,
+              "samples": 50
+            },
+            "gpu_mw": null,
+            "freq_mhz": {
+              "mean": 3628.946,
+              "min": 2220.39,
+              "max": 4031.18,
+              "samples": 50
+            }
+          },
+          "delta_package_w": 35.696,
+          "mj_per_inference": 161.05,
+          "package_mj_per_inference_incl_idle": 184.0
+        },
+        {
+          "repeat": 1,
+          "inferences": 4501,
+          "window_s": 20,
+          "throughput_per_s": 225.05,
+          "p50_ms": 4.14,
+          "idle": {
+            "package_w": {
+              "mean": 5.524,
+              "min": 3.84,
+              "max": 10.34,
+              "samples": 30
+            },
+            "gpu_mw": null,
+            "freq_mhz": {
+              "mean": 2370.567,
+              "min": 2191.17,
+              "max": 2810.46,
+              "samples": 30
+            }
+          },
+          "work": {
+            "package_w": {
+              "mean": 41.274,
+              "min": 3.87,
+              "max": 52.37,
+              "samples": 50
+            },
+            "gpu_mw": null,
+            "freq_mhz": {
+              "mean": 3618.655,
+              "min": 2071.8,
+              "max": 4017.24,
+              "samples": 50
+            }
+          },
+          "delta_package_w": 35.75,
+          "mj_per_inference": 158.85,
+          "package_mj_per_inference_incl_idle": 183.4
+        },
+        {
+          "repeat": 2,
+          "inferences": 4471,
+          "window_s": 20,
+          "throughput_per_s": 223.55,
+          "p50_ms": 4.2,
+          "idle": {
+            "package_w": {
+              "mean": 4.358,
+              "min": 3.71,
+              "max": 7.36,
+              "samples": 30
+            },
+            "gpu_mw": null,
+            "freq_mhz": {
+              "mean": 2283.788,
+              "min": 2037.24,
+              "max": 2552.18,
+              "samples": 30
+            }
+          },
+          "work": {
+            "package_w": {
+              "mean": 41.165,
+              "min": 3.8,
+              "max": 52.32,
+              "samples": 50
+            },
+            "gpu_mw": null,
+            "freq_mhz": {
+              "mean": 3592.706,
+              "min": 2049.44,
+              "max": 4009.28,
+              "samples": 50
+            }
+          },
+          "delta_package_w": 36.807,
+          "mj_per_inference": 164.65,
+          "package_mj_per_inference_incl_idle": 184.14
+        }
+      ],
+      "mj_per_inference": {
+        "median": 161.05,
+        "min": 158.85,
+        "max": 164.65
+      },
+      "throughput_per_s": 223.55,
+      "p50_ms": 4.16,
+      "gpu_power_reported": false
+    }
+  ],
+  "gpu_power_reported": false,
+  "sustained": {
+    "model": "coreml:resnet50_v2:fp32:cpu",
+    "seconds": 300,
+    "bucket_s": 10.0,
+    "buckets": [
+      {
+        "t": 10,
+        "throughput_per_s": 14.6,
+        "p50_ms": 68.49,
+        "package_w": 70.91,
+        "freq_mhz": 3939.0
+      },
+      {
+        "t": 20,
+        "throughput_per_s": 13.2,
+        "p50_ms": 73.91,
+        "package_w": 61.39,
+        "freq_mhz": 3632.0
+      },
+      {
+        "t": 30,
+        "throughput_per_s": 13.6,
+        "p50_ms": 72.83,
+        "package_w": 58.55,
+        "freq_mhz": 3604.0
+      },
+      {
+        "t": 40,
+        "throughput_per_s": 13.7,
+        "p50_ms": 73.32,
+        "package_w": 57.03,
+        "freq_mhz": 3562.0
+      },
+      {
+        "t": 50,
+        "throughput_per_s": 13.4,
+        "p50_ms": 74.67,
+        "package_w": 54.35,
+        "freq_mhz": 3500.0
+      },
+      {
+        "t": 60,
+        "throughput_per_s": 13.2,
+        "p50_ms": 75.49,
+        "package_w": 53.04,
+        "freq_mhz": 3469.0
+      },
+      {
+        "t": 70,
+        "throughput_per_s": 13.1,
+        "p50_ms": 75.69,
+        "package_w": 52.48,
+        "freq_mhz": 3456.0
+      },
+      {
+        "t": 80,
+        "throughput_per_s": 13.3,
+        "p50_ms": 74.11,
+        "package_w": 54.67,
+        "freq_mhz": 3526.0
+      },
+      {
+        "t": 90,
+        "throughput_per_s": 13.3,
+        "p50_ms": 75.6,
+        "package_w": 54.25,
+        "freq_mhz": 3500.0
+      },
+      {
+        "t": 100,
+        "throughput_per_s": 13.5,
+        "p50_ms": 73.83,
+        "package_w": 55.41,
+        "freq_mhz": 3542.0
+      },
+      {
+        "t": 110,
+        "throughput_per_s": 13.5,
+        "p50_ms": 73.18,
+        "package_w": 56.54,
+        "freq_mhz": 3568.0
+      },
+      {
+        "t": 120,
+        "throughput_per_s": 13.0,
+        "p50_ms": 74.76,
+        "package_w": 56.61,
+        "freq_mhz": 3534.0
+      },
+      {
+        "t": 130,
+        "throughput_per_s": 13.1,
+        "p50_ms": 74.79,
+        "package_w": 55.98,
+        "freq_mhz": 3533.0
+      },
+      {
+        "t": 140,
+        "throughput_per_s": 13.3,
+        "p50_ms": 73.56,
+        "package_w": 55.79,
+        "freq_mhz": 3551.0
+      },
+      {
+        "t": 151,
+        "throughput_per_s": 12.7,
+        "p50_ms": 77.43,
+        "package_w": 54.95,
+        "freq_mhz": 3487.0
+      },
+      {
+        "t": 161,
+        "throughput_per_s": 12.7,
+        "p50_ms": 77.17,
+        "package_w": 56.55,
+        "freq_mhz": 3518.0
+      },
+      {
+        "t": 171,
+        "throughput_per_s": 8.1,
+        "p50_ms": 102.55,
+        "package_w": 54.07,
+        "freq_mhz": 3298.0
+      },
+      {
+        "t": 181,
+        "throughput_per_s": 6.4,
+        "p50_ms": 147.97,
+        "package_w": 49.45,
+        "freq_mhz": 3154.0
+      },
+      {
+        "t": 191,
+        "throughput_per_s": 9.7,
+        "p50_ms": 87.98,
+        "package_w": 55.78,
+        "freq_mhz": 3310.0
+      },
+      {
+        "t": 201,
+        "throughput_per_s": 11.6,
+        "p50_ms": 84.22,
+        "package_w": 51.61,
+        "freq_mhz": 3358.0
+      },
+      {
+        "t": 211,
+        "throughput_per_s": 12.2,
+        "p50_ms": 80.07,
+        "package_w": 53.67,
+        "freq_mhz": 3422.0
+      },
+      {
+        "t": 221,
+        "throughput_per_s": 12.7,
+        "p50_ms": 77.89,
+        "package_w": 53.55,
+        "freq_mhz": 3471.0
+      },
+      {
+        "t": 231,
+        "throughput_per_s": 12.1,
+        "p50_ms": 81.18,
+        "package_w": 54.05,
+        "freq_mhz": 3438.0
+      },
+      {
+        "t": 241,
+        "throughput_per_s": 12.7,
+        "p50_ms": 77.55,
+        "package_w": 55.33,
+        "freq_mhz": 3494.0
+      },
+      {
+        "t": 251,
+        "throughput_per_s": 11.8,
+        "p50_ms": 82.38,
+        "package_w": 54.29,
+        "freq_mhz": 3427.0
+      },
+      {
+        "t": 261,
+        "throughput_per_s": 11.8,
+        "p50_ms": 82.55,
+        "package_w": 54.53,
+        "freq_mhz": 3438.0
+      },
+      {
+        "t": 271,
+        "throughput_per_s": 12.1,
+        "p50_ms": 82.13,
+        "package_w": 54.15,
+        "freq_mhz": 3433.0
+      },
+      {
+        "t": 281,
+        "throughput_per_s": 12.0,
+        "p50_ms": 81.73,
+        "package_w": 54.13,
+        "freq_mhz": 3431.0
+      },
+      {
+        "t": 291,
+        "throughput_per_s": 11.8,
+        "p50_ms": 82.49,
+        "package_w": 53.65,
+        "freq_mhz": 3416.0
+      },
+      {
+        "t": 301,
+        "throughput_per_s": 12.0,
+        "p50_ms": 81.68,
+        "package_w": 53.83,
+        "freq_mhz": 3422.0
+      }
+    ],
+    "overall": {
+      "package_w": {
+        "mean": 54.738,
+        "min": 8.59,
+        "max": 74.2,
+        "samples": 305
+      },
+      "gpu_mw": null,
+      "freq_mhz": {
+        "mean": 3468.934,
+        "min": 2431.19,
+        "max": 3956.4,
+        "samples": 305
+      }
+    },
+    "first_30s": {
+      "throughput_per_s": 13.799999999999999,
+      "package_w": 63.61666666666667,
+      "freq_mhz": 3725.0
+    },
+    "last_30s": {
+      "throughput_per_s": 11.933333333333332,
+      "package_w": 53.870000000000005,
+      "freq_mhz": 3423.0
+    }
+  }
+}

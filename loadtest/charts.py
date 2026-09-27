@@ -277,6 +277,135 @@ def gke() -> None:
     save(fig, "gke_autoscaling.png")
 
 
+def power() -> None:
+    data = load("power.json")
+    if not data:
+        return
+
+    # Helper to format label from "framework:model:precision:unit"
+    def format_label(label_str: str) -> str:
+        parts = label_str.split(":")
+        if len(parts) < 4:
+            return label_str
+        framework, model, precision, unit = parts[0], parts[1], parts[2], parts[3]
+
+        # Map model names
+        model_map = {"resnet50_v2": "ResNet-50 v2", "mobilenet_v3_large": "MobileNetV3-L"}
+        model_name = model_map.get(model, model)
+
+        # Map units
+        if framework == "coreml":
+            unit_map = {"cpu": "Core ML CPU", "cpu_gpu": "Core ML CPU+GPU"}
+            unit_name = unit_map.get(unit, unit)
+        elif framework == "onnxruntime":
+            unit_name = "ONNX Runtime CPU (4 thr)"
+        else:
+            unit_name = unit
+
+        return f"{model_name} {precision} · {unit_name}"
+
+    # Prepare data for row 1: horizontal bar chart
+    # The CPU+GPU configurations run on a discrete GPU that powermetrics does not report on this
+    # machine, so their package deltas are not an energy figure; they are left out of the chart.
+    rows_data = [r for r in data.get("rows", []) if not r["label"].endswith(":cpu_gpu")]
+    if not rows_data:
+        return
+
+    labels = [format_label(r["label"]) for r in rows_data]
+    medians = [r["mj_per_inference"]["median"] for r in rows_data]
+    mins = [r["mj_per_inference"]["min"] for r in rows_data]
+    maxs = [r["mj_per_inference"]["max"] for r in rows_data]
+    frameworks = [r["label"].split(":")[0] for r in rows_data]
+
+    # Sort by median ascending
+    sorted_indices = sorted(range(len(medians)), key=lambda i: medians[i])
+    labels = [labels[i] for i in sorted_indices]
+    medians = [medians[i] for i in sorted_indices]
+    mins = [mins[i] for i in sorted_indices]
+    maxs = [maxs[i] for i in sorted_indices]
+    frameworks = [frameworks[i] for i in sorted_indices]
+
+    # Determine if we have sustained data for row 2
+    has_sustained = "sustained" in data
+
+    if has_sustained:
+        fig, axes = plt.subplots(2, 1, figsize=(9.5, 8), height_ratios=[1, 1.2])
+        fig.subplots_adjust(hspace=0.5)
+        ax1 = axes[0]
+    else:
+        fig, ax1 = plt.subplots(figsize=(9, 4.5))
+
+    # Row 1: Horizontal bar chart
+    y_pos = np.arange(len(labels))
+    colors = [BLUE if fw == "coreml" else AQUA for fw in frameworks]
+    bars = ax1.barh(y_pos, medians, color=colors, edgecolor=SURFACE, linewidth=0)
+
+    # Add error bars (min-max as thin line)
+    errors = [(medians[i] - mins[i], maxs[i] - medians[i]) for i in range(len(medians))]
+    ax1.errorbar(medians, y_pos, xerr=list(zip(*errors)), fmt="none", ecolor="gray", capsize=3, linewidth=0.8)
+
+    # Annotate each bar with the value
+    for i, (bar, v) in enumerate(zip(bars, medians)):
+        ax1.annotate(f"{v:.1f}", (v, bar.get_y() + bar.get_height() / 2), xytext=(4, 0),
+                     textcoords="offset points", va="center", fontsize=8, color=INK2)
+
+    ax1.set_yticks(y_pos)
+    ax1.set_yticklabels(labels, fontsize=9)
+    ax1.set_xlabel("Median energy per inference (mJ)")
+    ax1.set_title("Energy per inference", loc="left")
+    ax1.grid(axis="x", visible=True)
+
+    # Row 2: Sustained run line chart (if present)
+    if has_sustained:
+        ax2 = axes[1]
+        sustained = data["sustained"]
+        buckets = sustained.get("buckets", [])
+
+        if buckets:
+            ts = [b["t"] for b in buckets]
+            package_ws = [b.get("package_w") for b in buckets]
+            throughputs = [b.get("throughput_per_s") for b in buckets]
+            freqs = [b.get("freq_mhz") for b in buckets]
+
+            # Plot package_w on left axis
+            ax2_left = ax2
+            ax2_left.plot(ts, package_ws, color=BLUE, label="Package power", linewidth=2)
+            ax2_left.set_ylabel("Package power (W)", color=BLUE)
+            ax2_left.tick_params(axis="y", labelcolor=BLUE)
+            ax2_left.set_xlabel("Time (s)")
+
+            # Plot throughput on right axis (dashed)
+            ax2_right = ax2.twinx()
+            ax2_right.plot(ts, throughputs, color=AQUA, label="Throughput", linewidth=2, linestyle="--")
+            ax2_right.set_ylabel("Throughput (inferences/s)", color=AQUA)
+            ax2_right.tick_params(axis="y", labelcolor=AQUA)
+
+            # Core frequency on a third axis, offset to the right
+            if any(f is not None for f in freqs):
+                ax2_freq = ax2.twinx()
+                ax2_freq.spines["right"].set_position(("axes", 1.12))
+                ax2_freq.plot(ts, [f / 1000 if f else None for f in freqs], color=INK2, label="Core frequency",
+                              linewidth=1, alpha=0.7)
+                ax2_freq.set_ylabel("Core frequency (GHz)", color=INK2)
+                ax2_freq.tick_params(axis="y", labelcolor=INK2)
+                ax2_freq.grid(False)
+            ax2_right.grid(False)
+
+            # Get model label for title
+            sustained_label = format_label(sustained.get("model", "sustained run"))
+            ax2.set_title(f"Sustained 5-minute run: {sustained_label}", loc="left")
+
+            # Add legend
+            handles, names = [], []
+            for ax in (ax2_left, ax2_right) + ((ax2_freq,) if any(f is not None for f in freqs) else ()):
+                h, n = ax.get_legend_handles_labels()
+                handles += h
+                names += n
+            ax2.legend(handles, names, loc="lower right", fontsize=8)
+
+    save(fig, "power.png")
+
+
 if __name__ == "__main__":
-    for fn in (models, capacity, steady, spike, canary, k8s, gke):
+    for fn in (models, capacity, steady, spike, canary, k8s, gke, power):
         fn()

@@ -31,7 +31,7 @@ By **Simran Kharbanda**
 | **Approach** | Two model tiers behind one gateway. A feedback controller watches the accurate tier's rolling p95 and shifts traffic to the fast tier only under pressure, fast to protect and slow to give back. An adaptive concurrency limit spills bursts instantly; circuit breakers, deadline propagation, canary rollouts with automatic rollback, and shadow traffic round it out. |
 | **Stack** | Python 3.12 · FastAPI · httpx · ONNX Runtime (static int8 quantization) · Prometheus + Grafana · OpenTelemetry + Jaeger · Docker Compose · Kubernetes (kind and GKE) with HPA + cluster autoscaler · Core ML |
 | **Key results** | At 2× capacity: **p95 2,721 → 192 ms, errors 27% → 0%, requests within SLA 0.4% → 99.8%** vs the naive proxy, with **64.1% top-1 vs 60.0%** for always-fast. A healthy canary was promoted 10→50→100% in 90 s; a faulty one was rolled back in 16 s with **zero client-visible errors**. On GKE, a 6-minute **4× spike stayed 99.8% within SLA** while the HPA and cluster autoscaler added 2 pods and a node in 81 s, cutting shedding 6×. |
-| **Findings** | ONNX Runtime's spinning threads plus a container CPU limit caused CFS throttling: **p95 279 → 74 ms** by turning spinning off. int8 quantization gave ResNet-50 **1.5× lower latency for 0.3–1.3 pt**, and MobileNetV3 **−4 pt for almost nothing**. |
+| **Findings** | ONNX Runtime's spinning threads plus a container CPU limit caused CFS throttling: **p95 279 → 74 ms** by turning spinning off. int8 quantization gave ResNet-50 **1.5× lower latency for 0.3–1.3 pt**, and MobileNetV3 **−4 pt for almost nothing**. Measured with `powermetrics`: ONNX Runtime int8 ResNet-50 costs **0.79 J per inference vs 3.75 J for Core ML fp32** on the same CPU, and the fast tier's MobileNetV3 **0.15 J**; energy tracks time-per-inference, not watts. |
 | **Quality** | 34 tests (all routing rules, controller hysteresis, breaker states, canary verdicts, end-to-end through fake backends), an open-loop load generator that also measures accuracy under load, every result repeated and its spread kept. |
 
 ## The problem
@@ -206,6 +206,62 @@ them on the Mac's CPU and GPU (AMD Radeon Pro 5300M, no Neural Engine). Top-1 on
 The GPU makes ResNet-50 7× faster than CPU. Core ML's int8 is weight-only (dequantized before compute),
 so it shrinks the model without speeding up the CPU path; ONNX Runtime's static quantization also
 quantizes activations, which is why it does cut CPU latency above.
+
+### On-device: energy per inference
+
+`models/power_bench.py` measures what each model version costs in energy on this Mac, using Apple's
+`powermetrics` (the only source of power counters on macOS, needs administrator access). For every
+configuration it samples an idle baseline for 10 s, then runs the model back to back for 20 s while
+sampling, and computes energy per inference as (work power − idle power) × 20 s ÷ inferences. Every
+configuration is repeated three times; the table shows the median and the min–max spread. Input is a
+random 1×3×224×224 tensor, batch 1. Measured 2026-09-27 on the i7-9750H (`results/power.json`).
+
+What `powermetrics` reports on this machine: the Intel package power (CPU cores + integrated GPU +
+system agent) and the core frequency. It reports **no power for the AMD Radeon Pro 5300M**, the
+discrete GPU that Core ML's `CPU_AND_GPU` mode actually uses, and in those runs the package draw
+barely moved (fp32 ResNet-50: 9.4 W idle → 14.1 W while doing 81 inferences/s). Those six
+configurations are therefore recorded but **not reported as energy figures**; the number would be the
+CPU's share of feeding the GPU, not the inference. Only the CPU paths below are comparable.
+
+![Energy](report/figures/power.png)
+
+| Model · precision · runtime (CPU) | mJ / inference (median, min–max) | Inferences / s | Package power |
+|---|---|---|---|
+| ResNet-50 v2 fp32 · Core ML | 3,748 (3,737–3,753) | 12.9 | 57.8 W |
+| ResNet-50 v2 fp16 · Core ML | 4,167 (4,053–4,186) | 12.7 | 53.8 W |
+| ResNet-50 v2 int8 · Core ML | 4,126 (4,042–4,214) | 12.6 | 54.7 W |
+| ResNet-50 v2 fp32 · ONNX Runtime, 4 threads | 1,251 (1,234–1,275) | 40.9 | 54.9 W |
+| **ResNet-50 v2 int8 · ONNX Runtime, 4 threads** | **791 (754–797)** | **66.3** | 56.1 W |
+| MobileNetV3-L fp32 · Core ML | 277 (267–278) | 93.0 | 27.4 W |
+| MobileNetV3-L fp16 · Core ML | 484 (474–491) | 74.2 | 39.2 W |
+| MobileNetV3-L int8 · Core ML | 482 (476–486) | 74.8 | 39.7 W |
+| MobileNetV3-L fp32 · ONNX Runtime, 4 threads | 147 (143–151) | 191.6 | 32.5 W |
+| MobileNetV3-L int8 · ONNX Runtime, 4 threads | 161 (159–165) | 223.6 | 41.1 W |
+
+Three things the numbers say. First, on this CPU energy per inference is set by *time* per inference,
+not by watts: every ResNet-50 run pulls 54–58 W whatever the framework or precision, so the runtime
+that finishes sooner wins, and ONNX Runtime's fp32 ResNet-50 costs a third of Core ML's (1.25 J vs
+3.75 J) at the same power. Second, quantization only saves energy when it saves time: ONNX Runtime's
+static int8 (weights *and* activations) cuts ResNet-50 from 1.25 J to 0.79 J, while Core ML's
+weight-only int8 costs slightly *more* than fp32 (4.13 J vs 3.75 J) because the weights are
+dequantized before compute. For MobileNetV3, ONNX int8 is 9% *more* energy than fp32: it is faster
+(224 vs 192 inferences/s) but runs the package 8.6 W hotter, and the extra power outweighs the saved
+time. Third, the gap between the two models is larger in energy than in latency: MobileNetV3 is
+8.5× cheaper than ResNet-50 in ONNX Runtime (147 vs 1,251 mJ) for a 10-point accuracy drop, which is
+the trade the gateway's fast tier makes, now with a number on it.
+
+**Sustained load.** A 5-minute back-to-back run of ResNet-50 fp32 (Core ML, CPU), sampled every
+second and bucketed per 10 s: the first 10 s ran at 3.9 GHz and 71 W (the turbo budget), then power
+settled to 53–57 W and 3.4–3.6 GHz within 40 s and stayed there. Throughput went from 14.6/s in the
+first bucket to 12.0/s in the last (−18%), all of it in that first minute. The core never dropped
+below 3.1 GHz (base clock is 2.6 GHz), so this is the chip's sustained power limit, not thermal
+throttling below spec. One 20-second dip at 170–190 s (throughput 6.4/s, power *down* to 49 W) is
+the shape of the workload being pre-empted, not of heat, and is left in the data.
+
+**Repeatability.** Idle draw was 1–10 W depending on what else the machine was doing between
+windows, which is why the baseline is re-sampled before every repeat; the three repeats of each CPU
+configuration agree within 4%. The first ResNet-50 configuration was re-measured after the main pass
+because a stuck process was running during its first baseline (noted in `results/power.json`).
 
 ## Results
 
@@ -419,6 +475,7 @@ make k8s-hpa       # the autoscaling experiment
 make gke-up GCP_PROJECT=<id>   # GKE Standard cluster with node autoscaling, images pushed to Artifact Registry
 make gke-run       # the 4x spike experiment; then `make gke-down` deletes the cluster
 make coreml        # Core ML conversion + on-device benchmark (macOS)
+make power         # energy per inference with powermetrics (macOS, needs sudo)
 ```
 
 Try it by hand once the stack is up:
@@ -436,7 +493,7 @@ src/gateway/         routing.py (per-request decision) · controller.py (SLA con
                      breaker.py · canary.py · stats.py (rolling windows) · config.py · app.py
 src/modelserver/     ONNX Runtime FastAPI server, preprocess.py (Pillow + NumPy)
 src/tracing/         OpenTelemetry setup shared by both services
-models/              export.py (ONNX + int8) · evaluate.py · dataset.py · coreml_bench.py
+models/              export.py (ONNX + int8) · evaluate.py · dataset.py · coreml_bench.py · power_bench.py
 loadtest/            loadgen.py (open-loop) · experiments.py · k8s_hpa.py · gke_experiment.py · charts.py · locustfile.py
 deploy/              registry.yaml (tiers + tuning) · prometheus/ · grafana/ · k8s/ (kind, HPA, jobs) · gke/ (GKE stack + loadgen job)
 docker/              builder, modelserver, gateway, loadgen images
