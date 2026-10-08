@@ -73,6 +73,18 @@ class Proc:
         self.log.close()
 
 
+def triton_env(python: str) -> dict:
+    """Triton's Python backend runs the model in its own stub process, which embeds the interpreter
+    but does not inherit a virtual or conda environment's module path unless that environment is
+    activated. Activate it the explicit way: its site-packages on PYTHONPATH, its lib/ on
+    LD_LIBRARY_PATH, its bin/ first on PATH."""
+    q = lambda code: subprocess.run([python, "-c", code], capture_output=True, text=True).stdout.strip()  # noqa: E731
+    site = q("import site; print(site.getsitepackages()[0])")
+    prefix = q("import sys; print(sys.prefix)")
+    return {"PYTHONPATH": site, "LD_LIBRARY_PATH": f"{prefix}/lib:" + os.environ.get("LD_LIBRARY_PATH", ""),
+            "PATH": f"{prefix}/bin:" + os.environ.get("PATH", ""), "CONDA_PREFIX": prefix, "VIRTUAL_ENV": prefix}
+
+
 def triton_metrics() -> dict:
     """Batch statistics from Triton's Prometheus endpoint."""
     try:
@@ -163,9 +175,10 @@ def run_arm(a, arm: str, spec: dict, model_name: str, out: dict, reference_rps: 
         wait_http("http://127.0.0.1:8100/readyz")
         gw_env = {"ACCURATE_URL": "http://127.0.0.1:8100", "ACCURATE_NAME": arm}
     else:
+        tenv = triton_env(a.python_triton)
         backend = Proc(arm, [a.python_triton, "-m", "triton.serve", "--model-dir", a.model_dir, "--name", model_name,
                              "--dump-config", f"results/raw/triton_{arm}_config.json", *spec["args"]],
-                       env={"PYTHONPATH": str(ROOT / "src")})
+                       env={**tenv, "PYTHONPATH": f"{ROOT / 'src'}:{tenv['PYTHONPATH']}"})
         PROCS.append(backend)
         wait_http(f"http://127.0.0.1:8000/v2/models/{model_name}/ready")
         gw_env = {"ACCURATE_URL": "http://127.0.0.1:8000", "ACCURATE_NAME": arm, "ACCURATE_PROTOCOL": "triton",

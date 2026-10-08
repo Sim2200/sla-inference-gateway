@@ -22,7 +22,7 @@ WORK = Path("/kaggle/working")
 SRC = Path(glob.glob("/kaggle/input/**/src/gateway/app.py", recursive=True)[0]).parents[2]
 PROJ = WORK / "proj"
 PY = sys.executable
-PY312 = WORK / "conda312" / "bin" / "python"
+PY312 = Path("/tmp/conda312/bin/python")  # outside /kaggle/working so it is not part of the kernel output
 
 
 def sh(*args, check=True, capture=False, env=None):
@@ -47,10 +47,10 @@ def main():
        "onnxruntime-gpu", "pillow", "numpy", check=False)
     conda = Path("/opt/conda/bin/conda")
     if conda.exists():
-        sh(conda, "create", "-y", "-q", "-p", WORK / "conda312", "python=3.12", check=False)
+        sh(conda, "create", "-y", "-q", "-p", "/tmp/conda312", "python=3.12", check=False)
     else:
         sh("bash", "-c", "curl -Ls https://micro.mamba.pm/api/micromamba/linux-64/latest | tar -xj -C /tmp bin/micromamba && "
-           f"/tmp/bin/micromamba create -y -q -r /tmp/mm -p {WORK / 'conda312'} -c conda-forge python=3.12", check=False)
+           f"/tmp/bin/micromamba create -y -q -r /tmp/mm -p /tmp/conda312 -c conda-forge python=3.12", check=False)
     sh(PY312, "-m", "pip", "install", "-q", "nvidia-pytriton", "onnxruntime-gpu", "numpy", "pillow", check=False)
     env = {"gpu": subprocess.run(["nvidia-smi", "--query-gpu=name,driver_version", "--format=csv,noheader"], capture_output=True, text=True).stdout.strip(),
            "python_serving": sys.version.split()[0],
