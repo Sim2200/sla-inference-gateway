@@ -58,8 +58,12 @@ def main() -> None:
     opts = ort.SessionOptions()
     opts.intra_op_num_threads = a.threads
     opts.add_session_config_entry("session.intra_op.allow_spinning", "0")
+    if hasattr(ort, "preload_dlls"):
+        ort.preload_dlls()  # find CUDA and cuDNN in the nvidia-* pip packages
     sess = ort.InferenceSession(str(model_dir / "model.onnx"), opts, providers=[a.provider, "CPUExecutionProvider"])
     print("providers", sess.get_providers(), flush=True)
+    if a.provider not in sess.get_providers():
+        raise SystemExit(f"{a.provider} requested but ONNX Runtime fell back to {sess.get_providers()}")
     x = np.zeros((1, 3, meta["crop"], meta["crop"]), dtype=np.float32)
     for _ in range(5):
         sess.run(None, {"input": x})
@@ -88,7 +92,9 @@ def main() -> None:
 
             time.sleep(1)
             with urllib.request.urlopen(f"http://127.0.0.1:{a.http_port}/v2/models/{a.name}/config", timeout=10) as r:
-                Path(a.dump_config).write_text(json.dumps(json.loads(r.read()), indent=2))
+                cfg = json.loads(r.read())
+            cfg["_serving"] = {"onnxruntime": ort.__version__, "providers": sess.get_providers(), "threads": a.threads}
+            Path(a.dump_config).write_text(json.dumps(cfg, indent=2))
         print(f"SERVING {a.name} max_batch={config.max_batch_size} batching={'off' if a.no_batching else 'dynamic'} "
               f"pid={os.getpid()}", flush=True)
         triton.serve()

@@ -1,0 +1,10 @@
+# Single-node kind cluster. The project folder is mounted into the node at /project
+# so pods can read the model artifacts and test images via hostPath volumes.
+# Create with:  kind create cluster --name sla --config deploy/k8s/kind-config.yaml
+kind: Cluster
+apiVersion: kind.x-k8s.io/v1alpha4
+nodes:
+  - role: control-plane
+    extraMounts:
+      - hostPath: .           # run kind from the project root
+        containerPath: /project

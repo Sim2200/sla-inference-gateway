@@ -79,7 +79,12 @@ def _session() -> ort.InferenceSession:
     # that spinning burns the CFS quota, the kernel throttles the whole container for
     # the rest of the 100 ms period, and p95/p99 latency spikes. Sleep instead.
     opts.add_session_config_entry("session.intra_op.allow_spinning", "0")
-    return ort.InferenceSession(str(MODEL_DIR / "model.onnx"), opts, providers=[ORT_PROVIDER, "CPUExecutionProvider"])
+    if ORT_PROVIDER != "CPUExecutionProvider" and hasattr(ort, "preload_dlls"):
+        ort.preload_dlls()  # find CUDA and cuDNN in the nvidia-* pip packages
+    sess = ort.InferenceSession(str(MODEL_DIR / "model.onnx"), opts, providers=[ORT_PROVIDER, "CPUExecutionProvider"])
+    if ORT_PROVIDER not in sess.get_providers():
+        raise SystemExit(f"ORT_PROVIDER={ORT_PROVIDER} requested but ONNX Runtime fell back to {sess.get_providers()}")
+    return sess
 
 
 SESSION = _session()
@@ -188,6 +193,7 @@ def readyz() -> dict:
 @app.get("/info")
 def info() -> dict:
     return {"tier": TIER, "version": VERSION, "meta": META, "ort_threads": ORT_THREADS, "ort_provider": ORT_PROVIDER,
+            "ort_providers_active": SESSION.get_providers(), "onnxruntime": ort.__version__,
             "max_concurrency": MAX_CONCURRENCY, "max_queue": MAX_QUEUE, "in_flight": _in_flight,
             "fault_error_rate": FAULT_ERROR_RATE, "fault_latency_ms": FAULT_LATENCY_MS}
 

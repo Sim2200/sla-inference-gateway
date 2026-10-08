@@ -1,0 +1,23 @@
+# In-cluster load generator. PROFILE and OUT are substituted by loadtest/k8s_hpa.py.
+apiVersion: batch/v1
+kind: Job
+metadata: {name: loadgen, namespace: sla}
+spec:
+  backoffLimit: 0
+  template:
+    spec:
+      restartPolicy: Never
+      containers:
+        - name: loadgen
+          image: slagw-loadgen:latest
+          imagePullPolicy: Never
+          workingDir: /work
+          command: ["python", "loadtest/loadgen.py", "--url", "http://gateway.sla.svc.cluster.local:8080",
+                    "--profile", "PROFILE", "--out", "OUT", "--poll-state", "--timeout", "60"]
+          resources:
+            requests: {cpu: "1"}
+            limits: {cpu: "2"}
+          volumeMounts: [{name: project, mountPath: /work}]
+      volumes:
+        - name: project
+          hostPath: {path: /project, type: Directory}

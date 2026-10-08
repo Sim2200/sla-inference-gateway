@@ -30,7 +30,6 @@ import httpx
 import numpy as np
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "models"))
-from dataset import split  # noqa: E402
 
 
 @dataclass
@@ -70,6 +69,8 @@ def load_images(n: int, seed: int, replay_dir: str | None = None) -> list[tuple[
         labels = json.loads((d / "labels.json").read_text())
         names = sorted(labels)[:n] if n else sorted(labels)
         return [((d / name).read_bytes(), int(labels[name])) for name in names]
+    from dataset import split  # the full-dataset path only; a replay folder needs no dataset code
+
     _, evaluation = split()
     chosen = random.Random(seed).sample(evaluation, n)
     return [(path.read_bytes(), label) for path, label in chosen]

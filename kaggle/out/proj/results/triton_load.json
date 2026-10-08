@@ -1,0 +1,45 @@
+{
+  "sla_ms": 300,
+  "model": "resnet50_v2_int8",
+  "arms": {
+    "fastapi_gpu": {
+      "error": "CalledProcessError: Command '['/usr/bin/python3', 'loadtest/loadgen.py', '--url', 'http://127.0.0.1:8080', '--profile', '5:8', '--out', 'results/raw/triton_fastapi_gpu_warm', '--sla-ms', '300', '--warmup-s', '5', '--timeout', '30', '--images', '500', '--replay-dir', 'data/replay']' returned non-zero exit status 1."
+    },
+    "fastapi_cpu": {
+      "error": "CalledProcessError: Command '['/usr/bin/python3', 'loadtest/loadgen.py', '--url', 'http://127.0.0.1:8080', '--profile', '5:8', '--out', 'results/raw/triton_fastapi_cpu_warm', '--sla-ms', '300', '--warmup-s', '5', '--timeout', '30', '--images', '500', '--replay-dir', 'data/replay']' returned non-zero exit status 1."
+    },
+    "triton_nobatch": {
+      "error": "CalledProcessError: Command '['/usr/bin/python3', 'loadtest/loadgen.py', '--url', 'http://127.0.0.1:8080', '--profile', '5:8', '--out', 'results/raw/triton_triton_nobatch_warm', '--sla-ms', '300', '--warmup-s', '5', '--timeout', '30', '--images', '500', '--replay-dir', 'data/replay']' returned non-zero exit status 1."
+    },
+    "triton_batch": {
+      "error": "CalledProcessError: Command '['/usr/bin/python3', 'loadtest/loadgen.py', '--url', 'http://127.0.0.1:8080', '--profile', '5:8', '--out', 'results/raw/triton_triton_batch_warm', '--sla-ms', '300', '--warmup-s', '5', '--timeout', '30', '--images', '500', '--replay-dir', 'data/replay']' returned non-zero exit status 1."
+    }
+  },
+  "rates_swept": [
+    10.0,
+    20.0,
+    40.0,
+    60.0,
+    80.0,
+    120.0,
+    160.0,
+    240.0,
+    320.0
+  ],
+  "point_s": 30,
+  "run_s": 60,
+  "triton": {
+    "max_batch": 32,
+    "queue_delay_us": 5000
+  },
+  "env": {
+    "gpu": "Tesla T4, 580.178.04\nTesla T4, 580.178.04",
+    "cpus": 4,
+    "python_serving": "3.13.15",
+    "python_triton": "3.12.15",
+    "pytriton": "0.7.0",
+    "onnxruntime_gpu": "1.30.0"
+  },
+  "reference_rps": null,
+  "note": "One GPU box, every process on the same machine (load generator included); fastapi_cpu is the tier as shipped (CPU). The Triton arms use Triton's Python backend calling ONNX Runtime CUDA, not the native onnxruntime backend, because the free GPU host has no Docker for the Triton container."
+}

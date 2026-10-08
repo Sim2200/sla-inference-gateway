@@ -1,0 +1,36 @@
+# Scale each model tier on CPU. The accurate tier is allowed to grow further
+# because it is the one users should get when capacity allows.
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata: {name: accurate, namespace: sla}
+spec:
+  scaleTargetRef: {apiVersion: apps/v1, kind: Deployment, name: accurate}
+  minReplicas: 1
+  maxReplicas: 4
+  metrics:
+    - type: Resource
+      resource: {name: cpu, target: {type: Utilization, averageUtilization: 70}}
+  behavior:
+    scaleUp:
+      stabilizationWindowSeconds: 0
+      policies: [{type: Pods, value: 1, periodSeconds: 15}]
+    scaleDown:
+      stabilizationWindowSeconds: 60
+      policies: [{type: Pods, value: 1, periodSeconds: 30}]
+---
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata: {name: fast, namespace: sla}
+spec:
+  scaleTargetRef: {apiVersion: apps/v1, kind: Deployment, name: fast}
+  minReplicas: 1
+  maxReplicas: 2
+  metrics:
+    - type: Resource
+      resource: {name: cpu, target: {type: Utilization, averageUtilization: 70}}
+  behavior:
+    scaleUp:
+      stabilizationWindowSeconds: 0
+      policies: [{type: Pods, value: 1, periodSeconds: 15}]
+    scaleDown:
+      stabilizationWindowSeconds: 60

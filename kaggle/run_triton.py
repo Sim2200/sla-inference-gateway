@@ -44,14 +44,14 @@ def main():
 
     sh(PY, "-m", "pip", "install", "-q", "fastapi", "uvicorn[standard]", "httpx", "pyyaml", "prometheus-client", "opentelemetry-sdk",
        "opentelemetry-instrumentation-fastapi", "opentelemetry-instrumentation-httpx", "opentelemetry-exporter-otlp-proto-http",
-       "onnxruntime-gpu", "pillow", "numpy", check=False)
+       "onnxruntime-gpu==1.22.0", "pillow", "numpy", check=False)  # 1.22: the last build for CUDA 12 on PyPI
     conda = Path("/opt/conda/bin/conda")
     if conda.exists():
         sh(conda, "create", "-y", "-q", "-p", "/tmp/conda312", "python=3.12", check=False)
     else:
         sh("bash", "-c", "curl -Ls https://micro.mamba.pm/api/micromamba/linux-64/latest | tar -xj -C /tmp bin/micromamba && "
            f"/tmp/bin/micromamba create -y -q -r /tmp/mm -p /tmp/conda312 -c conda-forge python=3.12", check=False)
-    sh(PY312, "-m", "pip", "install", "-q", "nvidia-pytriton", "onnxruntime-gpu", "numpy", "pillow", check=False)
+    sh(PY312, "-m", "pip", "install", "-q", "nvidia-pytriton", "onnxruntime-gpu==1.22.0", "numpy", "pillow", check=False)
     env = {"gpu": subprocess.run(["nvidia-smi", "--query-gpu=name,driver_version", "--format=csv,noheader"], capture_output=True, text=True).stdout.strip(),
            "python_serving": sys.version.split()[0],
            "python_triton": subprocess.run([str(PY312), "-c", "import sys; print(sys.version.split()[0])"], capture_output=True, text=True).stdout.strip(),

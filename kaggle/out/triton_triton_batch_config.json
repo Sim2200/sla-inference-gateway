@@ -1,0 +1,82 @@
+{
+  "name": "resnet50_v2_int8",
+  "platform": "",
+  "backend": "python",
+  "runtime": "",
+  "version_policy": {
+    "latest": {
+      "num_versions": 1
+    }
+  },
+  "max_batch_size": 32,
+  "input": [
+    {
+      "name": "image",
+      "data_type": "TYPE_STRING",
+      "format": "FORMAT_NONE",
+      "dims": [
+        1
+      ],
+      "is_shape_tensor": false,
+      "allow_ragged_batch": false,
+      "optional": false,
+      "is_non_linear_format_io": false
+    }
+  ],
+  "output": [
+    {
+      "name": "logits",
+      "data_type": "TYPE_FP32",
+      "dims": [
+        1000
+      ],
+      "label_filename": "",
+      "is_shape_tensor": false,
+      "is_non_linear_format_io": false
+    }
+  ],
+  "batch_input": [],
+  "batch_output": [],
+  "optimization": {
+    "priority": "PRIORITY_DEFAULT",
+    "input_pinned_memory": {
+      "enable": true
+    },
+    "output_pinned_memory": {
+      "enable": true
+    },
+    "gather_kernel_buffer_threshold": 0,
+    "eager_batching": false
+  },
+  "dynamic_batching": {
+    "preferred_batch_size": [
+      32
+    ],
+    "max_queue_delay_microseconds": 5000,
+    "preserve_ordering": false,
+    "priority_levels": 0,
+    "default_priority_level": 0,
+    "priority_queue_policy": {}
+  },
+  "instance_group": [
+    {
+      "name": "resnet50_v2_int8_0",
+      "kind": "KIND_CPU",
+      "count": 1,
+      "gpus": [],
+      "secondary_devices": [],
+      "profile": [],
+      "passive": false,
+      "host_policy": ""
+    }
+  ],
+  "default_model_filename": "model.py",
+  "cc_model_filenames": {},
+  "metric_tags": {},
+  "parameters": {
+    "workspace-path": {
+      "string_value": "/root/.cache/pytriton/workspace_2_p0kns0"
+    }
+  },
+  "model_warmup": []
+}

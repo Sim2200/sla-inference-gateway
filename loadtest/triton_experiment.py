@@ -102,7 +102,9 @@ def loadgen(profile: str, out: str, replay: str, py: str, warmup_s: float = 5, t
     cmd = [py, "loadtest/loadgen.py", "--url", GATEWAY, "--profile", profile, "--out", f"results/raw/{out}",
            "--sla-ms", str(SLA_MS), "--warmup-s", str(warmup_s), "--timeout", str(timeout), "--images", "500",
            "--replay-dir", replay]
-    subprocess.run(cmd, check=True, cwd=ROOT, stdout=subprocess.DEVNULL)
+    r = subprocess.run(cmd, cwd=ROOT, capture_output=True, text=True)
+    if r.returncode != 0:
+        raise RuntimeError(f"loadgen failed ({r.returncode}): {r.stderr[-1500:]}")
     return json.loads((ROOT / "results/raw" / f"{out}.json").read_text())["overall"]
 
 
@@ -173,6 +175,8 @@ def run_arm(a, arm: str, spec: dict, model_name: str, out: dict, reference_rps: 
                        env={"MODEL_DIR": str(ROOT / a.model_dir), "TIER": "accurate", "PYTHONPATH": str(ROOT / "src"), **spec["env"]})
         PROCS.append(backend)
         wait_http("http://127.0.0.1:8100/readyz")
+        info = http("http://127.0.0.1:8100/info")
+        out["arms"].setdefault(arm, {})["serving"] = {k: info.get(k) for k in ("ort_provider", "ort_providers_active", "onnxruntime", "ort_threads", "max_concurrency")}
         gw_env = {"ACCURATE_URL": "http://127.0.0.1:8100", "ACCURATE_NAME": arm}
     else:
         tenv = triton_env(a.python_triton)
@@ -226,6 +230,8 @@ def run_arm(a, arm: str, spec: dict, model_name: str, out: dict, reference_rps: 
     cfg = ROOT / f"results/raw/triton_{arm}_config.json"
     if cfg.exists():
         record["triton_model_config"] = json.loads(cfg.read_text())
+        record["serving"] = record["triton_model_config"].pop("_serving", None)
+    record.setdefault("serving", out["arms"].get(arm, {}).get("serving"))
     out["arms"][arm] = record
     return reference_rps
 

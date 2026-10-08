@@ -1,0 +1,64 @@
+[1;31m2026-10-08 15:37:17.886797303 [E:onnxruntime:Default, provider_bridge_ort.cc:2395 TryGetProviderInfo_CUDA] /onnxruntime_src/onnxruntime/core/session/provider_bridge_ort.cc:1988 onnxruntime::Provider& onnxruntime::ProviderLibrary::Get() [ONNXRuntimeError] : 1 : FAIL : Failed to load library /tmp/conda312/lib/python3.12/site-packages/onnxruntime/capi/libonnxruntime_providers_cuda.so with error: libcublasLt.so.13: cannot open shared object file: No such file or directory
+[m
+[0;93m2026-10-08 15:37:17.886848144 [W:onnxruntime:Default, onnxruntime_pybind_state.cc:1294 CreateExecutionProviderFactoryInstance] Failed to create CUDAExecutionProvider. Require cuDNN 9.* and CUDA 13.*. Please install all dependencies as mentioned in the GPU requirements page (https://onnxruntime.ai/docs/execution-providers/CUDA-ExecutionProvider.html#requirements), make sure they're in the PATH, and that your GPU is supported.[m
+providers ['CPUExecutionProvider']
+I1008 15:37:18.650091 517 pinned_memory_manager.cc:277] "Pinned memory pool is created at '0x781480000000' with size 268435456"
+I1008 15:37:18.656753 517 cuda_memory_manager.cc:107] "CUDA memory pool is created on device 0 with size 67108864"
+I1008 15:37:18.656784 517 cuda_memory_manager.cc:107] "CUDA memory pool is created on device 1 with size 67108864"
+I1008 15:37:18.841996 517 server.cc:604] 
++------------------+------+
+| Repository Agent | Path |
++------------------+------+
++------------------+------+
+
+I1008 15:37:18.842055 517 server.cc:631] 
++---------+------+--------+
+| Backend | Path | Config |
++---------+------+--------+
++---------+------+--------+
+
+I1008 15:37:18.842087 517 server.cc:674] 
++-------+---------+--------+
+| Model | Version | Status |
++-------+---------+--------+
++-------+---------+--------+
+
+I1008 15:37:18.896431 517 metrics.cc:877] "Collecting metrics for GPU 0: Tesla T4"
+I1008 15:37:18.896475 517 metrics.cc:877] "Collecting metrics for GPU 1: Tesla T4"
+I1008 15:37:18.910909 517 metrics.cc:770] "Collecting CPU metrics"
+I1008 15:37:18.911135 517 tritonserver.cc:2598] 
++----------------------------------+------------------------------------------+
+| Option                           | Value                                    |
++----------------------------------+------------------------------------------+
+| server_id                        | triton                                   |
+| server_version                   | 2.51.0                                   |
+| server_extensions                | classification sequence model_repository |
+|                                  |  model_repository(unload_dependents) sch |
+|                                  | edule_policy model_configuration system_ |
+|                                  | shared_memory cuda_shared_memory binary_ |
+|                                  | tensor_data parameters statistics trace  |
+|                                  | logging                                  |
+| model_repository_path[0]         | /root/.cache/pytriton/workspace_2_p0kns0 |
+|                                  | /model-store                             |
+| model_control_mode               | MODE_EXPLICIT                            |
+| startup_models_0                 | *                                        |
+| strict_model_config              | 0                                        |
+| model_config_name                |                                          |
+| rate_limit                       | OFF                                      |
+| pinned_memory_pool_byte_size     | 268435456                                |
+| cuda_memory_pool_byte_size{0}    | 67108864                                 |
+| cuda_memory_pool_byte_size{1}    | 67108864                                 |
+| min_supported_compute_capability | 6.0                                      |
+| strict_readiness                 | 1                                        |
+| exit_timeout                     | 30                                       |
+| cache_enabled                    | 0                                        |
++----------------------------------+------------------------------------------+
+
+I1008 15:37:18.913132 517 grpc_server.cc:2558] "Started GRPCInferenceService at 0.0.0.0:8001"
+I1008 15:37:18.913488 517 http_server.cc:4713] "Started HTTPService at 0.0.0.0:8000"
+I1008 15:37:18.955153 517 http_server.cc:362] "Started Metrics Service at 0.0.0.0:8002"
+E1008 15:37:19.207603 517 model_repository_manager.cc:470] "Failed to set config modification time: model_config_content_name_ is empty"
+I1008 15:37:19.208025 517 model_lifecycle.cc:472] "loading: resnet50_v2_int8:1"
+I1008 15:37:20.831719 517 python_be.cc:2249] "TRITONBACKEND_ModelInstanceInitialize: resnet50_v2_int8_0_0 (CPU device 0)"
+I1008 15:37:21.386571 517 model_lifecycle.cc:839] "successfully loaded 'resnet50_v2_int8'"
+SERVING resnet50_v2_int8 max_batch=32 batching=dynamic pid=511
