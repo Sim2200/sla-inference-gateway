@@ -117,6 +117,7 @@ def main() -> None:
     ap.add_argument("--fast-model-dir", default="models/artifacts/mobilenet_v3_large_fp32")
     ap.add_argument("--max-batch", type=int, default=32)
     ap.add_argument("--queue-delay-us", type=int, default=5000)
+    ap.add_argument("--instances", type=int, default=2, help="Triton model instances in both Triton arms")
     ap.add_argument("--rates", default="10,20,40,60,80,120,160,240,320")
     ap.add_argument("--point-s", type=int, default=30)
     ap.add_argument("--run-s", type=int, default=60)
@@ -130,11 +131,12 @@ def main() -> None:
     arms = {
         "fastapi_cpu": dict(kind="modelserver", env={"ORT_PROVIDER": "CPUExecutionProvider"}),
         "fastapi_gpu": dict(kind="modelserver", env={"ORT_PROVIDER": "CUDAExecutionProvider"}),
-        "triton_nobatch": dict(kind="triton", args=["--no-batching"]),
-        "triton_batch": dict(kind="triton", args=["--max-batch", str(a.max_batch), "--queue-delay-us", str(a.queue_delay_us)]),
+        "triton_nobatch": dict(kind="triton", args=["--no-batching", "--instances", str(a.instances)]),
+        "triton_batch": dict(kind="triton", args=["--max-batch", str(a.max_batch), "--queue-delay-us", str(a.queue_delay_us),
+                                                  "--instances", str(a.instances)]),
     }
     out = {"sla_ms": SLA_MS, "model": model_name, "arms": {}, "rates_swept": rates, "point_s": a.point_s, "run_s": a.run_s,
-           "triton": {"max_batch": a.max_batch, "queue_delay_us": a.queue_delay_us}}
+           "triton": {"max_batch": a.max_batch, "queue_delay_us": a.queue_delay_us, "instances": a.instances}}
     env_info = subprocess.run(["nvidia-smi", "--query-gpu=name,driver_version", "--format=csv,noheader"], capture_output=True, text=True)
     out["env"] = {"gpu": env_info.stdout.strip(), "cpus": os.cpu_count()}
 

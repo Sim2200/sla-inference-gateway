@@ -47,6 +47,7 @@ def main() -> None:
     ap.add_argument("--no-batching", action="store_true", help="max batch 1, no dynamic batcher (the control arm)")
     ap.add_argument("--provider", default="CUDAExecutionProvider")
     ap.add_argument("--threads", type=int, default=2)
+    ap.add_argument("--instances", type=int, default=2, help="model instances (concurrent inference callables)")
     ap.add_argument("--http-port", type=int, default=8000)
     ap.add_argument("--grpc-port", type=int, default=8001)
     ap.add_argument("--metrics-port", type=int, default=8002)
@@ -77,13 +78,17 @@ def main() -> None:
         return {"logits": logits.astype(np.float32)}
 
     if a.no_batching:
-        config = ModelConfig(max_batch_size=1, batching=False)
+        # batching stays on so the request shape ([1, 1]) is the same in both arms; a maximum batch
+        # of 1 means the dynamic batcher never groups requests
+        config = ModelConfig(max_batch_size=1)
     else:
         config = ModelConfig(max_batch_size=a.max_batch, batcher=DynamicBatcher(max_queue_delay_microseconds=a.queue_delay_us))
 
     triton_cfg = TritonConfig(http_port=a.http_port, grpc_port=a.grpc_port, metrics_port=a.metrics_port, log_verbose=0)
     with Triton(config=triton_cfg) as triton:
-        triton.bind(model_name=a.name, infer_func=infer,
+        # `--instances` copies of the callable: Triton runs them concurrently, so the per-request
+        # decode and resize (CPU work, in Python) can overlap instead of queueing behind one call
+        triton.bind(model_name=a.name, infer_func=[infer] * a.instances,
                     inputs=[Tensor(name="image", dtype=np.bytes_, shape=(1,))],
                     outputs=[Tensor(name="logits", dtype=np.float32, shape=(1000,))],
                     config=config, strict=False)
@@ -93,9 +98,10 @@ def main() -> None:
             time.sleep(1)
             with urllib.request.urlopen(f"http://127.0.0.1:{a.http_port}/v2/models/{a.name}/config", timeout=10) as r:
                 cfg = json.loads(r.read())
-            cfg["_serving"] = {"onnxruntime": ort.__version__, "providers": sess.get_providers(), "threads": a.threads}
+            cfg["_serving"] = {"onnxruntime": ort.__version__, "providers": sess.get_providers(), "threads": a.threads,
+                               "instances": a.instances}
             Path(a.dump_config).write_text(json.dumps(cfg, indent=2))
-        print(f"SERVING {a.name} max_batch={config.max_batch_size} batching={'off' if a.no_batching else 'dynamic'} "
+        print(f"SERVING {a.name} max_batch={config.max_batch_size} batching={'off' if a.no_batching else 'dynamic'} instances={a.instances} "
               f"pid={os.getpid()}", flush=True)
         triton.serve()
 

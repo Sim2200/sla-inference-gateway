@@ -1,0 +1,495 @@
+{
+  "sla_ms": 300,
+  "model": "resnet50_v2_int8",
+  "arms": {
+    "fastapi_gpu": {
+      "capacity_sweep": [
+        {
+          "rps": 10.0,
+          "offered_rps": 9.8,
+          "goodput_rps": 9.8,
+          "p50_ms": 23.8,
+          "p95_ms": 44.8,
+          "p99_ms": 66.7,
+          "within_sla": 1.0,
+          "error_rate": 0.0
+        },
+        {
+          "rps": 20.0,
+          "offered_rps": 20.52,
+          "goodput_rps": 20.52,
+          "p50_ms": 23.3,
+          "p95_ms": 62.5,
+          "p99_ms": 98.4,
+          "within_sla": 1.0,
+          "error_rate": 0.0
+        },
+        {
+          "rps": 40.0,
+          "offered_rps": 40.84,
+          "goodput_rps": 40.84,
+          "p50_ms": 25.9,
+          "p95_ms": 82.8,
+          "p99_ms": 123.5,
+          "within_sla": 1.0,
+          "error_rate": 0.0
+        },
+        {
+          "rps": 60.0,
+          "offered_rps": 61.28,
+          "goodput_rps": 61.28,
+          "p50_ms": 37.3,
+          "p95_ms": 142.8,
+          "p99_ms": 189.8,
+          "within_sla": 1.0,
+          "error_rate": 0.0
+        },
+        {
+          "rps": 80.0,
+          "offered_rps": 82.0,
+          "goodput_rps": 1.32,
+          "p50_ms": 800.6,
+          "p95_ms": 949.6,
+          "p99_ms": 1519.0,
+          "within_sla": 0.0161,
+          "error_rate": 0.0795
+        }
+      ],
+      "capacity_rps": 60.0,
+      "runs": {
+        "1x": {
+          "rps": 60.0,
+          "requests": 3048,
+          "offered_rps": 60.96,
+          "goodput_rps": 60.86,
+          "p50_ms": 36.4,
+          "p95_ms": 172.7,
+          "p99_ms": 227.0,
+          "within_sla": 0.9984,
+          "error_rate": 0.0,
+          "shed_rate": 0.0,
+          "fast_share": 0.0,
+          "top1_accuracy": 0.685
+        },
+        "2x": {
+          "rps": 120.0,
+          "requests": 6045,
+          "offered_rps": 120.9,
+          "goodput_rps": 0.88,
+          "p50_ms": 880.2,
+          "p95_ms": 1058.0,
+          "p99_ms": 1701.3,
+          "within_sla": 0.0073,
+          "error_rate": 0.4056,
+          "shed_rate": 0.0,
+          "fast_share": 0.0,
+          "top1_accuracy": 0.6919
+        }
+      },
+      "serving": {
+        "ort_provider": "CUDAExecutionProvider",
+        "ort_providers_active": [
+          "CUDAExecutionProvider",
+          "CPUExecutionProvider"
+        ],
+        "onnxruntime": "1.22.0",
+        "ort_threads": 2,
+        "max_concurrency": 1
+      }
+    },
+    "fastapi_cpu": {
+      "capacity_sweep": [
+        {
+          "rps": 10.0,
+          "offered_rps": 9.8,
+          "goodput_rps": 9.72,
+          "p50_ms": 46.2,
+          "p95_ms": 151.2,
+          "p99_ms": 283.6,
+          "within_sla": 0.9918,
+          "error_rate": 0.0
+        },
+        {
+          "rps": 20.0,
+          "offered_rps": 20.52,
+          "goodput_rps": 16.56,
+          "p50_ms": 156.1,
+          "p95_ms": 430.2,
+          "p99_ms": 493.9,
+          "within_sla": 0.807,
+          "error_rate": 0.0
+        }
+      ],
+      "capacity_rps": 10.0,
+      "runs": {
+        "1x": {
+          "rps": 60.0,
+          "requests": 3048,
+          "offered_rps": 60.96,
+          "goodput_rps": 0.02,
+          "p50_ms": 2865.4,
+          "p95_ms": 2997.6,
+          "p99_ms": 3058.1,
+          "within_sla": 0.0003,
+          "error_rate": 0.6293,
+          "shed_rate": 0.0,
+          "fast_share": 0.0,
+          "top1_accuracy": 0.6681
+        },
+        "2x": {
+          "rps": 120.0,
+          "requests": 6045,
+          "offered_rps": 120.9,
+          "goodput_rps": 0.0,
+          "p50_ms": 84222.4,
+          "p95_ms": 166942.6,
+          "p99_ms": 186154.1,
+          "within_sla": 0.0,
+          "error_rate": 0.4579,
+          "shed_rate": 0.0,
+          "fast_share": 0.0,
+          "top1_accuracy": 0.6887
+        }
+      },
+      "serving": {
+        "ort_provider": "CPUExecutionProvider",
+        "ort_providers_active": [
+          "CPUExecutionProvider"
+        ],
+        "onnxruntime": "1.22.0",
+        "ort_threads": 2,
+        "max_concurrency": 1
+      }
+    },
+    "triton_nobatch": {
+      "capacity_sweep": [
+        {
+          "rps": 10.0,
+          "offered_rps": 9.8,
+          "goodput_rps": 0.0,
+          "p50_ms": null,
+          "p95_ms": null,
+          "p99_ms": null,
+          "within_sla": 0.0,
+          "error_rate": 1.0,
+          "triton_mean_batch": null
+        }
+      ],
+      "capacity_rps": null,
+      "runs": {
+        "1x": {
+          "rps": 60.0,
+          "requests": 3048,
+          "offered_rps": 60.96,
+          "goodput_rps": 0.0,
+          "p50_ms": null,
+          "p95_ms": null,
+          "p99_ms": null,
+          "within_sla": 0.0,
+          "error_rate": 1.0,
+          "shed_rate": 0.0,
+          "fast_share": null,
+          "top1_accuracy": null,
+          "triton_mean_batch": null,
+          "triton_queue_us_per_request": 0
+        },
+        "2x": {
+          "rps": 120.0,
+          "requests": 6045,
+          "offered_rps": 120.9,
+          "goodput_rps": 0.0,
+          "p50_ms": null,
+          "p95_ms": null,
+          "p99_ms": null,
+          "within_sla": 0.0,
+          "error_rate": 1.0,
+          "shed_rate": 0.0,
+          "fast_share": null,
+          "top1_accuracy": null,
+          "triton_mean_batch": null,
+          "triton_queue_us_per_request": 0
+        }
+      },
+      "triton_model_config": {
+        "name": "resnet50_v2_int8",
+        "platform": "",
+        "backend": "python",
+        "runtime": "",
+        "version_policy": {
+          "latest": {
+            "num_versions": 1
+          }
+        },
+        "max_batch_size": 0,
+        "input": [
+          {
+            "name": "image",
+            "data_type": "TYPE_STRING",
+            "format": "FORMAT_NONE",
+            "dims": [
+              1
+            ],
+            "is_shape_tensor": false,
+            "allow_ragged_batch": false,
+            "optional": false,
+            "is_non_linear_format_io": false
+          }
+        ],
+        "output": [
+          {
+            "name": "logits",
+            "data_type": "TYPE_FP32",
+            "dims": [
+              1000
+            ],
+            "label_filename": "",
+            "is_shape_tensor": false,
+            "is_non_linear_format_io": false
+          }
+        ],
+        "batch_input": [],
+        "batch_output": [],
+        "optimization": {
+          "priority": "PRIORITY_DEFAULT",
+          "input_pinned_memory": {
+            "enable": true
+          },
+          "output_pinned_memory": {
+            "enable": true
+          },
+          "gather_kernel_buffer_threshold": 0,
+          "eager_batching": false
+        },
+        "instance_group": [
+          {
+            "name": "resnet50_v2_int8_0",
+            "kind": "KIND_CPU",
+            "count": 1,
+            "gpus": [],
+            "secondary_devices": [],
+            "profile": [],
+            "passive": false,
+            "host_policy": ""
+          }
+        ],
+        "default_model_filename": "model.py",
+        "cc_model_filenames": {},
+        "metric_tags": {},
+        "parameters": {
+          "workspace-path": {
+            "string_value": "/root/.cache/pytriton/workspace_375wejo4"
+          }
+        },
+        "model_warmup": []
+      },
+      "serving": {
+        "onnxruntime": "1.22.0",
+        "providers": [
+          "CUDAExecutionProvider",
+          "CPUExecutionProvider"
+        ],
+        "threads": 2
+      }
+    },
+    "triton_batch": {
+      "capacity_sweep": [
+        {
+          "rps": 10.0,
+          "offered_rps": 9.8,
+          "goodput_rps": 9.76,
+          "p50_ms": 34.4,
+          "p95_ms": 143.0,
+          "p99_ms": 214.3,
+          "within_sla": 0.9959,
+          "error_rate": 0.0,
+          "triton_mean_batch": 1.09
+        },
+        {
+          "rps": 20.0,
+          "offered_rps": 20.52,
+          "goodput_rps": 20.48,
+          "p50_ms": 72.8,
+          "p95_ms": 195.7,
+          "p99_ms": 240.0,
+          "within_sla": 0.9981,
+          "error_rate": 0.0,
+          "triton_mean_batch": 1.34
+        },
+        {
+          "rps": 40.0,
+          "offered_rps": 40.84,
+          "goodput_rps": 38.12,
+          "p50_ms": 182.1,
+          "p95_ms": 312.4,
+          "p99_ms": 427.7,
+          "within_sla": 0.9334,
+          "error_rate": 0.0,
+          "triton_mean_batch": 2.9
+        },
+        {
+          "rps": 60.0,
+          "offered_rps": 61.28,
+          "goodput_rps": 33.2,
+          "p50_ms": 291.8,
+          "p95_ms": 461.5,
+          "p99_ms": 565.6,
+          "within_sla": 0.5418,
+          "error_rate": 0.0,
+          "triton_mean_batch": 6.54
+        }
+      ],
+      "capacity_rps": 40.0,
+      "runs": {
+        "1x": {
+          "rps": 60.0,
+          "requests": 3048,
+          "offered_rps": 60.96,
+          "goodput_rps": 32.6,
+          "p50_ms": 292.5,
+          "p95_ms": 534.4,
+          "p99_ms": 709.1,
+          "within_sla": 0.5348,
+          "error_rate": 0.0,
+          "shed_rate": 0.0,
+          "fast_share": 0.0,
+          "top1_accuracy": 0.6864,
+          "triton_mean_batch": 6.62,
+          "triton_queue_us_per_request": 124023.3
+        },
+        "2x": {
+          "rps": 120.0,
+          "requests": 6045,
+          "offered_rps": 120.9,
+          "goodput_rps": 0.0,
+          "p50_ms": 769505.4,
+          "p95_ms": 2216804.2,
+          "p99_ms": 2221997.7,
+          "within_sla": 0.0,
+          "error_rate": 0.558,
+          "shed_rate": 0.0,
+          "fast_share": 0.0,
+          "top1_accuracy": 0.6868,
+          "triton_mean_batch": 16.53,
+          "triton_queue_us_per_request": 1303242.7
+        }
+      },
+      "triton_model_config": {
+        "name": "resnet50_v2_int8",
+        "platform": "",
+        "backend": "python",
+        "runtime": "",
+        "version_policy": {
+          "latest": {
+            "num_versions": 1
+          }
+        },
+        "max_batch_size": 32,
+        "input": [
+          {
+            "name": "image",
+            "data_type": "TYPE_STRING",
+            "format": "FORMAT_NONE",
+            "dims": [
+              1
+            ],
+            "is_shape_tensor": false,
+            "allow_ragged_batch": false,
+            "optional": false,
+            "is_non_linear_format_io": false
+          }
+        ],
+        "output": [
+          {
+            "name": "logits",
+            "data_type": "TYPE_FP32",
+            "dims": [
+              1000
+            ],
+            "label_filename": "",
+            "is_shape_tensor": false,
+            "is_non_linear_format_io": false
+          }
+        ],
+        "batch_input": [],
+        "batch_output": [],
+        "optimization": {
+          "priority": "PRIORITY_DEFAULT",
+          "input_pinned_memory": {
+            "enable": true
+          },
+          "output_pinned_memory": {
+            "enable": true
+          },
+          "gather_kernel_buffer_threshold": 0,
+          "eager_batching": false
+        },
+        "dynamic_batching": {
+          "preferred_batch_size": [
+            32
+          ],
+          "max_queue_delay_microseconds": 5000,
+          "preserve_ordering": false,
+          "priority_levels": 0,
+          "default_priority_level": 0,
+          "priority_queue_policy": {}
+        },
+        "instance_group": [
+          {
+            "name": "resnet50_v2_int8_0",
+            "kind": "KIND_CPU",
+            "count": 1,
+            "gpus": [],
+            "secondary_devices": [],
+            "profile": [],
+            "passive": false,
+            "host_policy": ""
+          }
+        ],
+        "default_model_filename": "model.py",
+        "cc_model_filenames": {},
+        "metric_tags": {},
+        "parameters": {
+          "workspace-path": {
+            "string_value": "/root/.cache/pytriton/workspace_bobj22qc"
+          }
+        },
+        "model_warmup": []
+      },
+      "serving": {
+        "onnxruntime": "1.22.0",
+        "providers": [
+          "CUDAExecutionProvider",
+          "CPUExecutionProvider"
+        ],
+        "threads": 2
+      }
+    }
+  },
+  "rates_swept": [
+    10.0,
+    20.0,
+    40.0,
+    60.0,
+    80.0,
+    120.0,
+    160.0,
+    240.0,
+    320.0
+  ],
+  "point_s": 30,
+  "run_s": 60,
+  "triton": {
+    "max_batch": 32,
+    "queue_delay_us": 5000
+  },
+  "env": {
+    "gpu": "Tesla T4, 580.178.04\nTesla T4, 580.178.04",
+    "cpus": 4,
+    "python_serving": "3.13.15",
+    "python_triton": "3.12.15",
+    "pytriton": "0.7.0",
+    "onnxruntime_gpu": "1.22.0"
+  },
+  "reference_rps": 60.0,
+  "note": "One GPU box, every process on the same machine (load generator included); fastapi_cpu is the tier as shipped (CPU). The Triton arms use Triton's Python backend calling ONNX Runtime CUDA, not the native onnxruntime backend, because the free GPU host has no Docker for the Triton container."
+}
