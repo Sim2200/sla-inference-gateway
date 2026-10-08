@@ -1,7 +1,8 @@
 """Gateway configuration: a YAML model registry plus tuning knobs.
 
 Environment variables override the backends, so the same file works in Docker
-Compose and in Kubernetes: ACCURATE_URL, FAST_URL, ACCURATE_NAME, FAST_NAME.
+Compose and in Kubernetes: ACCURATE_URL, FAST_URL, ACCURATE_NAME, FAST_NAME, and
+ACCURATE_PROTOCOL / ACCURATE_MODEL (likewise FAST_) to point a tier at a Triton model.
 """
 
 from __future__ import annotations
@@ -20,6 +21,11 @@ from .controller import ControllerConfig, LimitConfig
 class Target:
     name: str
     url: str
+    # "modelserver": POST {url}/predict with the raw image bytes (src/modelserver).
+    # "triton": Triton Inference Server's KServe v2 API, POST {url}/v2/models/{model}/infer,
+    # the image sent as one BYTES element (see src/triton/serve.py for the model side).
+    protocol: str = "modelserver"
+    model: str = ""
 
 
 @dataclass
@@ -47,6 +53,10 @@ def _tier(raw: dict, prefix: str) -> TierConfig:
     target = Target(**raw["target"])
     target.url = os.environ.get(f"{prefix}_URL", target.url)
     target.name = os.environ.get(f"{prefix}_NAME", target.name)
+    target.protocol = os.environ.get(f"{prefix}_PROTOCOL", target.protocol)
+    target.model = os.environ.get(f"{prefix}_MODEL", target.model)
+    if target.protocol not in ("modelserver", "triton"):
+        raise ValueError(f"unknown protocol {target.protocol!r} for {prefix}")
     return TierConfig(target=target, limit=LimitConfig(**raw.get("limit", {})),
                       adaptive=raw.get("adaptive", True))
 

@@ -15,6 +15,8 @@ MODEL_DIR            directory with model.onnx and meta.json            (require
 LABELS_PATH          JSON list of 1,000 class names       (MODEL_DIR/../labels.json)
 TIER, VERSION        labels reported in responses and metrics
 ORT_THREADS          ONNX Runtime intra-op threads                             (2)
+ORT_PROVIDER         CPUExecutionProvider (default) or CUDAExecutionProvider; the GPU
+                     option needs the onnxruntime-gpu wheel and is used in the Triton comparison
 MAX_CONCURRENCY      inferences allowed at the same time                        (1)
 MAX_QUEUE            waiting requests before 503                               (64)
 FAULT_ERROR_RATE     fraction of requests that fail with 500, for testing     (0.0)
@@ -47,6 +49,7 @@ LABELS_PATH = Path(os.environ.get("LABELS_PATH", MODEL_DIR.parent / "labels.json
 TIER = os.environ.get("TIER", "unknown")
 VERSION = os.environ.get("VERSION", "v1")
 ORT_THREADS = int(os.environ.get("ORT_THREADS", "2"))
+ORT_PROVIDER = os.environ.get("ORT_PROVIDER", "CPUExecutionProvider")
 MAX_CONCURRENCY = int(os.environ.get("MAX_CONCURRENCY", "1"))
 MAX_QUEUE = int(os.environ.get("MAX_QUEUE", "64"))
 FAULT_ERROR_RATE = float(os.environ.get("FAULT_ERROR_RATE", "0"))
@@ -76,7 +79,7 @@ def _session() -> ort.InferenceSession:
     # that spinning burns the CFS quota, the kernel throttles the whole container for
     # the rest of the 100 ms period, and p95/p99 latency spikes. Sleep instead.
     opts.add_session_config_entry("session.intra_op.allow_spinning", "0")
-    return ort.InferenceSession(str(MODEL_DIR / "model.onnx"), opts, providers=["CPUExecutionProvider"])
+    return ort.InferenceSession(str(MODEL_DIR / "model.onnx"), opts, providers=[ORT_PROVIDER, "CPUExecutionProvider"])
 
 
 SESSION = _session()
@@ -184,7 +187,7 @@ def readyz() -> dict:
 
 @app.get("/info")
 def info() -> dict:
-    return {"tier": TIER, "version": VERSION, "meta": META, "ort_threads": ORT_THREADS,
+    return {"tier": TIER, "version": VERSION, "meta": META, "ort_threads": ORT_THREADS, "ort_provider": ORT_PROVIDER,
             "max_concurrency": MAX_CONCURRENCY, "max_queue": MAX_QUEUE, "in_flight": _in_flight,
             "fault_error_rate": FAULT_ERROR_RATE, "fault_latency_ms": FAULT_LATENCY_MS}
 

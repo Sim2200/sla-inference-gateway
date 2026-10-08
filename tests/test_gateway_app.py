@@ -144,3 +144,31 @@ def test_ops_endpoints(path):
     app, _ = make()
     with TestClient(app) as c:
         assert c.get(path).status_code == 200
+
+
+def test_triton_protocol_tier_is_called_through_the_kserve_api():
+    """A tier whose target uses protocol "triton" is called at /v2/models/<model>/infer with the
+    image as one BYTES element, and its logits come back in the model server's top5 shape."""
+    seen = {}
+
+    def fake(request: httpx.Request) -> httpx.Response:
+        seen["url"] = str(request.url)
+        seen["body"] = request.read()
+        logits = [0.0] * 1000
+        logits[7] = 20.0
+        return httpx.Response(200, json={"model_name": "resnet", "outputs": [{"name": "logits", "datatype": "FP32",
+                                                                            "shape": [1, 1000], "data": logits}]})
+
+    cfg = GatewayConfig(
+        accurate=TierConfig(Target("resnet-triton", "http://triton:8000", protocol="triton", model="resnet"), LimitConfig(initial=4)),
+        fast=TierConfig(Target("fast-v1", "http://fast"), LimitConfig(initial=8)),
+        mode="always_accurate", controller=ControllerConfig(window_s=5, min_samples=1), canary=CanaryConfig(stage_s=0.05))
+    app = create_app(cfg, transport=httpx.MockTransport(fake), tick_s=0)
+    with TestClient(app) as c:
+        r = c.post("/predict", content=b"jpeg-bytes")
+    assert r.status_code == 200
+    body = r.json()
+    assert seen["url"] == "http://triton:8000/v2/models/resnet/infer"
+    assert b'"datatype": "BYTES"' in seen["body"] or b'"datatype":"BYTES"' in seen["body"]
+    assert body["routed_to"] == "accurate" and body["target"] == "resnet-triton"
+    assert body["top5"][0]["index"] == 7 and 0.99 < body["top5"][0]["score"] <= 1.0

@@ -12,6 +12,8 @@ OpenTelemetry (see `tracing`).
 from __future__ import annotations
 
 import asyncio
+import base64
+import math
 import random
 import time
 from contextlib import asynccontextmanager
@@ -50,6 +52,8 @@ class Backend:
     url: str
     tier: str
     breaker: CircuitBreaker
+    protocol: str = "modelserver"
+    model: str = ""
     window: RollingWindow = field(default_factory=lambda: RollingWindow(60.0))  # canary comparisons
     in_flight: int = 0
 
@@ -69,7 +73,8 @@ class Gateway:
 
     def _backend(self, target: config_module.Target, tier: str) -> Backend:
         return Backend(target.name, target.url, tier,
-                       CircuitBreaker(self.cfg.breaker_failures, self.cfg.breaker_open_s))
+                       CircuitBreaker(self.cfg.breaker_failures, self.cfg.breaker_open_s),
+                       protocol=target.protocol, model=target.model)
 
     def reset(self) -> None:
         """Clear learned state (used between benchmark runs)."""
@@ -149,9 +154,12 @@ class Gateway:
         backend.in_flight += 1
         start = time.monotonic()
         try:
-            r = await self.client.post(f"{backend.url}/predict", content=body, timeout=timeout)
-            status = r.status_code
-            data = r.json() if r.headers.get("content-type", "").startswith("application/json") else {}
+            if backend.protocol == "triton":
+                status, data = await self._call_triton(backend, body, timeout)
+            else:
+                r = await self.client.post(f"{backend.url}/predict", content=body, timeout=timeout)
+                status = r.status_code
+                data = r.json() if r.headers.get("content-type", "").startswith("application/json") else {}
         except httpx.TimeoutException:
             status, data = 504, {"detail": "backend timeout"}
         except httpx.TransportError as exc:
@@ -165,6 +173,28 @@ class Gateway:
         backend.window.add(now, latency_ms, status == 200)
         self.tier_windows[backend.tier].add(now, latency_ms, status == 200)
         return status, data
+
+    async def _call_triton(self, backend: Backend, body: bytes, timeout: float) -> tuple[int, dict]:
+        """One request through Triton's KServe v2 HTTP API. The image goes as a single BYTES
+        element (base64 in the JSON body); the model answers with a (1, 1000) logits tensor, and the
+        response is reshaped to the model server's {"top5": [...]} format so the rest of the
+        gateway (shadow comparisons, the load generator's accuracy check) does not care which
+        protocol answered."""
+        assert self.client is not None
+        payload = {"inputs": [{"name": "image", "shape": [1, 1], "datatype": "BYTES",
+                               "data": [base64.b64encode(body).decode("ascii")]}],
+                   "outputs": [{"name": "logits"}]}
+        r = await self.client.post(f"{backend.url}/v2/models/{backend.model}/infer", json=payload, timeout=timeout)
+        if r.status_code != 200:
+            detail = r.json().get("error", r.text[:200]) if r.headers.get("content-type", "").startswith("application/json") else r.text[:200]
+            return r.status_code, {"detail": f"triton: {detail}"}
+        logits = r.json()["outputs"][0]["data"]
+        zmax = max(logits)
+        exp = [math.exp(v - zmax) for v in logits]
+        total = sum(exp)
+        top = sorted(range(len(logits)), key=lambda i: -logits[i])[:5]
+        return 200, {"tier": backend.tier, "version": "triton", "model": backend.model,
+                     "top5": [{"index": i, "label": "", "score": round(exp[i] / total, 4)} for i in top]}
 
     def _finish(self, start: float, backend: Backend | None, reason: str, status: int, data: dict):
         tier = backend.tier if backend else "none"
