@@ -72,6 +72,13 @@ def push_kernel(user: str, src_slug: str) -> str:
 
 def wait(kid: str, poll: int = 30) -> str:
     t0 = time.time()
+    # Right after a push the status endpoint still reports the previous version for a while;
+    # wait until the new version shows up as queued or running before waiting for completion.
+    while time.time() - t0 < 300:
+        status = kaggle("kernels", "status", kid, check=False).strip().splitlines()[-1].lower()
+        if "queued" in status or "running" in status:
+            break
+        time.sleep(10)
     while True:
         status = kaggle("kernels", "status", kid, check=False).strip().splitlines()[-1]
         print(f"  {time.time() - t0:6.0f} s  {status}", flush=True)
