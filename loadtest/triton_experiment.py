@@ -53,7 +53,11 @@ def wait_http(url: str, timeout: float = 240) -> None:
             return
         except Exception:  # noqa: BLE001
             time.sleep(1)
-    raise SystemExit(f"timeout waiting for {url}")
+        # a backend that died while we wait would otherwise cost the full timeout
+        dead = [p for p in PROCS if p.p.poll() is not None]
+        if dead:
+            raise RuntimeError(f"process exited early: {[d.p.args[:3] for d in dead]}")
+    raise RuntimeError(f"timeout waiting for {url}")  # RuntimeError so one arm's failure does not end the experiment
 
 
 class Proc:

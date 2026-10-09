@@ -69,13 +69,19 @@ def main() -> None:
     for _ in range(5):
         sess.run(None, {"input": x})
 
-    @batch
-    def infer(image: np.ndarray) -> dict:
-        # `image` is (N, 1) of bytes: N requests Triton's batcher put together. Decode each, then
-        # one ONNX Runtime call for the whole batch; that batching is where the GPU wins.
-        xs = [preprocess_bytes(base64.b64decode(row[0]), meta["resize"], meta["crop"])[0] for row in image]
-        logits = sess.run(None, {"input": np.stack(xs).astype(np.float32)})[0]
-        return {"logits": logits.astype(np.float32)}
+    def make_infer(instance: int):
+        # one callable per model instance (PyTriton keys instances by the callable); all share the
+        # ONNX Runtime session, which is safe to call from several threads
+        @batch
+        def infer(image: np.ndarray) -> dict:
+            # `image` is (N, 1) of bytes: N requests Triton's batcher put together. Decode each, then
+            # one ONNX Runtime call for the whole batch; that batching is where the GPU wins.
+            xs = [preprocess_bytes(base64.b64decode(row[0]), meta["resize"], meta["crop"])[0] for row in image]
+            logits = sess.run(None, {"input": np.stack(xs).astype(np.float32)})[0]
+            return {"logits": logits.astype(np.float32)}
+
+        infer.__name__ = f"infer_{instance}"
+        return infer
 
     if a.no_batching:
         # batching stays on so the request shape ([1, 1]) is the same in both arms; a maximum batch
@@ -88,7 +94,7 @@ def main() -> None:
     with Triton(config=triton_cfg) as triton:
         # `--instances` copies of the callable: Triton runs them concurrently, so the per-request
         # decode and resize (CPU work, in Python) can overlap instead of queueing behind one call
-        triton.bind(model_name=a.name, infer_func=[infer] * a.instances,
+        triton.bind(model_name=a.name, infer_func=[make_infer(i) for i in range(a.instances)],
                     inputs=[Tensor(name="image", dtype=np.bytes_, shape=(1,))],
                     outputs=[Tensor(name="logits", dtype=np.float32, shape=(1000,))],
                     config=config, strict=False)
