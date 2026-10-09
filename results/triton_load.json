@@ -8,9 +8,9 @@
           "rps": 10.0,
           "offered_rps": 9.8,
           "goodput_rps": 9.8,
-          "p50_ms": 23.8,
-          "p95_ms": 44.8,
-          "p99_ms": 66.7,
+          "p50_ms": 27.1,
+          "p95_ms": 54.3,
+          "p99_ms": 90.8,
           "within_sla": 1.0,
           "error_rate": 0.0
         },
@@ -18,9 +18,9 @@
           "rps": 20.0,
           "offered_rps": 20.52,
           "goodput_rps": 20.52,
-          "p50_ms": 23.3,
-          "p95_ms": 62.5,
-          "p99_ms": 98.4,
+          "p50_ms": 28.7,
+          "p95_ms": 77.8,
+          "p99_ms": 154.9,
           "within_sla": 1.0,
           "error_rate": 0.0
         },
@@ -28,31 +28,31 @@
           "rps": 40.0,
           "offered_rps": 40.84,
           "goodput_rps": 40.84,
-          "p50_ms": 25.9,
-          "p95_ms": 82.8,
-          "p99_ms": 123.5,
+          "p50_ms": 38.2,
+          "p95_ms": 133.8,
+          "p99_ms": 196.7,
           "within_sla": 1.0,
           "error_rate": 0.0
         },
         {
           "rps": 60.0,
           "offered_rps": 61.28,
-          "goodput_rps": 61.28,
-          "p50_ms": 37.3,
-          "p95_ms": 142.8,
-          "p99_ms": 189.8,
-          "within_sla": 1.0,
+          "goodput_rps": 60.68,
+          "p50_ms": 81.2,
+          "p95_ms": 230.1,
+          "p99_ms": 293.1,
+          "within_sla": 0.9902,
           "error_rate": 0.0
         },
         {
           "rps": 80.0,
           "offered_rps": 82.0,
-          "goodput_rps": 1.32,
-          "p50_ms": 800.6,
-          "p95_ms": 949.6,
-          "p99_ms": 1519.0,
-          "within_sla": 0.0161,
-          "error_rate": 0.0795
+          "goodput_rps": 1.24,
+          "p50_ms": 980.4,
+          "p95_ms": 1222.7,
+          "p99_ms": 1906.0,
+          "within_sla": 0.0151,
+          "error_rate": 0.2263
         }
       ],
       "capacity_rps": 60.0,
@@ -61,11 +61,11 @@
           "rps": 60.0,
           "requests": 3048,
           "offered_rps": 60.96,
-          "goodput_rps": 60.86,
-          "p50_ms": 36.4,
-          "p95_ms": 172.7,
-          "p99_ms": 227.0,
-          "within_sla": 0.9984,
+          "goodput_rps": 51.8,
+          "p50_ms": 112.5,
+          "p95_ms": 402.0,
+          "p99_ms": 482.0,
+          "within_sla": 0.8497,
           "error_rate": 0.0,
           "shed_rate": 0.0,
           "fast_share": 0.0,
@@ -75,15 +75,15 @@
           "rps": 120.0,
           "requests": 6045,
           "offered_rps": 120.9,
-          "goodput_rps": 0.88,
-          "p50_ms": 880.2,
-          "p95_ms": 1058.0,
-          "p99_ms": 1701.3,
-          "within_sla": 0.0073,
-          "error_rate": 0.4056,
+          "goodput_rps": 1.12,
+          "p50_ms": 1134.5,
+          "p95_ms": 1380.0,
+          "p99_ms": 2252.3,
+          "within_sla": 0.0093,
+          "error_rate": 0.5322,
           "shed_rate": 0.0,
           "fast_share": 0.0,
-          "top1_accuracy": 0.6919
+          "top1_accuracy": 0.6871
         }
       },
       "serving": {
@@ -102,21 +102,21 @@
         {
           "rps": 10.0,
           "offered_rps": 9.8,
-          "goodput_rps": 9.72,
-          "p50_ms": 46.2,
-          "p95_ms": 151.2,
-          "p99_ms": 283.6,
-          "within_sla": 0.9918,
+          "goodput_rps": 9.64,
+          "p50_ms": 62.2,
+          "p95_ms": 219.4,
+          "p99_ms": 329.0,
+          "within_sla": 0.9837,
           "error_rate": 0.0
         },
         {
           "rps": 20.0,
           "offered_rps": 20.52,
-          "goodput_rps": 16.56,
-          "p50_ms": 156.1,
-          "p95_ms": 430.2,
-          "p99_ms": 493.9,
-          "within_sla": 0.807,
+          "goodput_rps": 3.24,
+          "p50_ms": 716.7,
+          "p95_ms": 1146.7,
+          "p99_ms": 1268.9,
+          "within_sla": 0.1579,
           "error_rate": 0.0
         }
       ],
@@ -126,29 +126,29 @@
           "rps": 60.0,
           "requests": 3048,
           "offered_rps": 60.96,
-          "goodput_rps": 0.02,
-          "p50_ms": 2865.4,
-          "p95_ms": 2997.6,
-          "p99_ms": 3058.1,
-          "within_sla": 0.0003,
-          "error_rate": 0.6293,
+          "goodput_rps": 0.04,
+          "p50_ms": 3507.9,
+          "p95_ms": 3670.1,
+          "p99_ms": 3716.4,
+          "within_sla": 0.0007,
+          "error_rate": 0.6965,
           "shed_rate": 0.0,
           "fast_share": 0.0,
-          "top1_accuracy": 0.6681
+          "top1_accuracy": 0.667
         },
         "2x": {
           "rps": 120.0,
           "requests": 6045,
           "offered_rps": 120.9,
           "goodput_rps": 0.0,
-          "p50_ms": 84222.4,
-          "p95_ms": 166942.6,
-          "p99_ms": 186154.1,
+          "p50_ms": 108013.6,
+          "p95_ms": 213713.2,
+          "p99_ms": 233191.0,
           "within_sla": 0.0,
-          "error_rate": 0.4579,
+          "error_rate": 0.4551,
           "shed_rate": 0.0,
           "fast_share": 0.0,
-          "top1_accuracy": 0.6887
+          "top1_accuracy": 0.6846
         }
       },
       "serving": {
@@ -166,48 +166,92 @@
         {
           "rps": 10.0,
           "offered_rps": 9.8,
-          "goodput_rps": 0.0,
-          "p50_ms": null,
-          "p95_ms": null,
-          "p99_ms": null,
-          "within_sla": 0.0,
-          "error_rate": 1.0,
-          "triton_mean_batch": null
+          "goodput_rps": 9.76,
+          "p50_ms": 35.0,
+          "p95_ms": 49.6,
+          "p99_ms": 67.5,
+          "within_sla": 0.9959,
+          "error_rate": 0.0,
+          "triton_mean_batch": 1.0
+        },
+        {
+          "rps": 20.0,
+          "offered_rps": 20.52,
+          "goodput_rps": 20.48,
+          "p50_ms": 37.0,
+          "p95_ms": 72.7,
+          "p99_ms": 110.7,
+          "within_sla": 0.9981,
+          "error_rate": 0.0,
+          "triton_mean_batch": 1.0
+        },
+        {
+          "rps": 40.0,
+          "offered_rps": 40.84,
+          "goodput_rps": 40.76,
+          "p50_ms": 40.6,
+          "p95_ms": 88.9,
+          "p99_ms": 114.4,
+          "within_sla": 0.998,
+          "error_rate": 0.0,
+          "triton_mean_batch": 1.0
+        },
+        {
+          "rps": 60.0,
+          "offered_rps": 61.28,
+          "goodput_rps": 61.16,
+          "p50_ms": 54.5,
+          "p95_ms": 147.6,
+          "p99_ms": 197.6,
+          "within_sla": 0.998,
+          "error_rate": 0.0,
+          "triton_mean_batch": 1.0
+        },
+        {
+          "rps": 80.0,
+          "offered_rps": 82.0,
+          "goodput_rps": 0.84,
+          "p50_ms": 1648.1,
+          "p95_ms": 12497.3,
+          "p99_ms": 17386.9,
+          "within_sla": 0.0102,
+          "error_rate": 0.0,
+          "triton_mean_batch": 1.0
         }
       ],
-      "capacity_rps": null,
+      "capacity_rps": 60.0,
       "runs": {
         "1x": {
           "rps": 60.0,
           "requests": 3048,
           "offered_rps": 60.96,
-          "goodput_rps": 0.0,
-          "p50_ms": null,
-          "p95_ms": null,
-          "p99_ms": null,
-          "within_sla": 0.0,
-          "error_rate": 1.0,
+          "goodput_rps": 60.84,
+          "p50_ms": 54.5,
+          "p95_ms": 176.7,
+          "p99_ms": 236.6,
+          "within_sla": 0.998,
+          "error_rate": 0.0,
           "shed_rate": 0.0,
-          "fast_share": null,
-          "top1_accuracy": null,
-          "triton_mean_batch": null,
-          "triton_queue_us_per_request": 0
+          "fast_share": 0.0,
+          "top1_accuracy": 0.685,
+          "triton_mean_batch": 1.0,
+          "triton_queue_us_per_request": 61961.1
         },
         "2x": {
           "rps": 120.0,
           "requests": 6045,
           "offered_rps": 120.9,
           "goodput_rps": 0.0,
-          "p50_ms": null,
-          "p95_ms": null,
-          "p99_ms": null,
+          "p50_ms": 902270.6,
+          "p95_ms": 1790488.6,
+          "p99_ms": 1802855.0,
           "within_sla": 0.0,
-          "error_rate": 1.0,
+          "error_rate": 0.4599,
           "shed_rate": 0.0,
-          "fast_share": null,
-          "top1_accuracy": null,
-          "triton_mean_batch": null,
-          "triton_queue_us_per_request": 0
+          "fast_share": 0.0,
+          "top1_accuracy": 0.6845,
+          "triton_mean_batch": 1.0,
+          "triton_queue_us_per_request": 94914.0
         }
       },
       "triton_model_config": {
@@ -220,7 +264,7 @@
             "num_versions": 1
           }
         },
-        "max_batch_size": 0,
+        "max_batch_size": 1,
         "input": [
           {
             "name": "image",
@@ -260,11 +304,21 @@
           "gather_kernel_buffer_threshold": 0,
           "eager_batching": false
         },
+        "dynamic_batching": {
+          "preferred_batch_size": [
+            1
+          ],
+          "max_queue_delay_microseconds": 0,
+          "preserve_ordering": false,
+          "priority_levels": 0,
+          "default_priority_level": 0,
+          "priority_queue_policy": {}
+        },
         "instance_group": [
           {
             "name": "resnet50_v2_int8_0",
             "kind": "KIND_CPU",
-            "count": 1,
+            "count": 2,
             "gpus": [],
             "secondary_devices": [],
             "profile": [],
@@ -277,7 +331,7 @@
         "metric_tags": {},
         "parameters": {
           "workspace-path": {
-            "string_value": "/root/.cache/pytriton/workspace_375wejo4"
+            "string_value": "/root/.cache/pytriton/workspace_3ezttrz5"
           }
         },
         "model_warmup": []
@@ -288,7 +342,8 @@
           "CUDAExecutionProvider",
           "CPUExecutionProvider"
         ],
-        "threads": 2
+        "threads": 2,
+        "instances": 2
       }
     },
     "triton_batch": {
@@ -296,46 +351,46 @@
         {
           "rps": 10.0,
           "offered_rps": 9.8,
-          "goodput_rps": 9.76,
-          "p50_ms": 34.4,
-          "p95_ms": 143.0,
-          "p99_ms": 214.3,
-          "within_sla": 0.9959,
+          "goodput_rps": 9.72,
+          "p50_ms": 39.4,
+          "p95_ms": 111.4,
+          "p99_ms": 158.0,
+          "within_sla": 0.9918,
           "error_rate": 0.0,
-          "triton_mean_batch": 1.09
+          "triton_mean_batch": 1.06
         },
         {
           "rps": 20.0,
           "offered_rps": 20.52,
           "goodput_rps": 20.48,
-          "p50_ms": 72.8,
-          "p95_ms": 195.7,
-          "p99_ms": 240.0,
+          "p50_ms": 46.6,
+          "p95_ms": 144.7,
+          "p99_ms": 233.5,
           "within_sla": 0.9981,
           "error_rate": 0.0,
-          "triton_mean_batch": 1.34
+          "triton_mean_batch": 1.18
         },
         {
           "rps": 40.0,
           "offered_rps": 40.84,
-          "goodput_rps": 38.12,
-          "p50_ms": 182.1,
-          "p95_ms": 312.4,
-          "p99_ms": 427.7,
-          "within_sla": 0.9334,
+          "goodput_rps": 40.44,
+          "p50_ms": 127.1,
+          "p95_ms": 240.9,
+          "p99_ms": 299.5,
+          "within_sla": 0.9902,
           "error_rate": 0.0,
-          "triton_mean_batch": 2.9
+          "triton_mean_batch": 1.72
         },
         {
           "rps": 60.0,
           "offered_rps": 61.28,
-          "goodput_rps": 33.2,
-          "p50_ms": 291.8,
-          "p95_ms": 461.5,
-          "p99_ms": 565.6,
-          "within_sla": 0.5418,
+          "goodput_rps": 51.2,
+          "p50_ms": 220.1,
+          "p95_ms": 383.2,
+          "p99_ms": 519.3,
+          "within_sla": 0.8355,
           "error_rate": 0.0,
-          "triton_mean_batch": 6.54
+          "triton_mean_batch": 3.34
         }
       ],
       "capacity_rps": 40.0,
@@ -344,33 +399,33 @@
           "rps": 60.0,
           "requests": 3048,
           "offered_rps": 60.96,
-          "goodput_rps": 32.6,
-          "p50_ms": 292.5,
-          "p95_ms": 534.4,
-          "p99_ms": 709.1,
-          "within_sla": 0.5348,
+          "goodput_rps": 28.74,
+          "p50_ms": 323.4,
+          "p95_ms": 8024.1,
+          "p99_ms": 13057.2,
+          "within_sla": 0.4715,
           "error_rate": 0.0,
           "shed_rate": 0.0,
           "fast_share": 0.0,
-          "top1_accuracy": 0.6864,
-          "triton_mean_batch": 6.62,
-          "triton_queue_us_per_request": 124023.3
+          "top1_accuracy": 0.687,
+          "triton_mean_batch": 3.13,
+          "triton_queue_us_per_request": 55501.9
         },
         "2x": {
           "rps": 120.0,
           "requests": 6045,
           "offered_rps": 120.9,
           "goodput_rps": 0.0,
-          "p50_ms": 769505.4,
-          "p95_ms": 2216804.2,
-          "p99_ms": 2221997.7,
+          "p50_ms": 511532.5,
+          "p95_ms": 524042.3,
+          "p99_ms": 621373.1,
           "within_sla": 0.0,
-          "error_rate": 0.558,
+          "error_rate": 0.4511,
           "shed_rate": 0.0,
           "fast_share": 0.0,
-          "top1_accuracy": 0.6868,
-          "triton_mean_batch": 16.53,
-          "triton_queue_us_per_request": 1303242.7
+          "top1_accuracy": 0.6905,
+          "triton_mean_batch": 3.9,
+          "triton_queue_us_per_request": 181049.6
         }
       },
       "triton_model_config": {
@@ -437,7 +492,7 @@
           {
             "name": "resnet50_v2_int8_0",
             "kind": "KIND_CPU",
-            "count": 1,
+            "count": 2,
             "gpus": [],
             "secondary_devices": [],
             "profile": [],
@@ -450,7 +505,7 @@
         "metric_tags": {},
         "parameters": {
           "workspace-path": {
-            "string_value": "/root/.cache/pytriton/workspace_bobj22qc"
+            "string_value": "/root/.cache/pytriton/workspace_nn3hfmx8"
           }
         },
         "model_warmup": []
@@ -461,7 +516,8 @@
           "CUDAExecutionProvider",
           "CPUExecutionProvider"
         ],
-        "threads": 2
+        "threads": 2,
+        "instances": 2
       }
     }
   },
@@ -480,7 +536,8 @@
   "run_s": 60,
   "triton": {
     "max_batch": 32,
-    "queue_delay_us": 5000
+    "queue_delay_us": 5000,
+    "instances": 2
   },
   "env": {
     "gpu": "Tesla T4, 580.178.04\nTesla T4, 580.178.04",
