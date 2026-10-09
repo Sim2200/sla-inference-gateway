@@ -412,6 +412,50 @@ the obvious next step and is listed under future work.
 Cost: the run used a 3-node cluster for about 25 minutes, roughly $0.30 at list price. The cluster
 was deleted afterwards (`make gke-down`); `make gke-up` recreates it in ~5 minutes.
 
+### 8. Triton Inference Server as a tier: dynamic batching on a GPU (results/triton_load.json)
+
+One Kaggle T4 box (Tesla T4 GPU, 4 CPUs, Python 3.13.15 for model serving and Python 3.12.15 for Triton, PyTriton 0.7.0, ONNX Runtime GPU 1.22.0). The same ResNet-50 int8 ONNX file in four servers behind the gateway in always_accurate mode: fastapi_cpu (ONNX Runtime CPU, 2 threads, one inference at a time, the tier as shipped), fastapi_gpu (same server with ORT_PROVIDER=CUDAExecutionProvider), triton_nobatch (PyTriton Python backend calling ONNX Runtime CUDA, 2 model instances, max batch 1), triton_batch (same with Triton's dynamic batcher: max batch 32, queue delay 5,000 us). Open-loop load generator (loadtest/loadgen.py) with 500 ImageNetV2 images, capacity sweep of 30 s points until p95 crosses 300 ms or errors appear, then 60 s runs at 1x (60 req/s, the FastAPI GPU server's capacity) and 2x (120 req/s). Triton ran in-process through PyTriton's Python backend because the free GPU host has no Docker for the Triton container, so this is Triton's scheduler, batcher, protocol and metrics with a Python model, not the native onnxruntime backend. Triton on Kubernetes with a GPU was not run (no free option).
+
+#### Capacity sweep
+
+| Arm | RPS | p50 ms | p95 ms | Within SLA | Error rate | Mean batch |
+|---|---|---|---|---|---|---|
+| fastapi_cpu | 10 | 62 | 219 | 98.4% | 0.0% | |
+| fastapi_cpu | 20 | 717 | 1147 | 15.8% | 0.0% | |
+| fastapi_gpu | 10 | 27 | 54 | 100% | 0.0% | |
+| fastapi_gpu | 20 | 29 | 78 | 100% | 0.0% | |
+| fastapi_gpu | 40 | 38 | 134 | 100% | 0.0% | |
+| fastapi_gpu | **60** | 81 | **230** | 99.0% | 0.0% | |
+| fastapi_gpu | 80 | 980 | 1223 | 1.5% | 22.6% | |
+| triton_nobatch | 10 | 35 | 50 | 99.6% | 0.0% | 1.0 |
+| triton_nobatch | 20 | 37 | 73 | 99.8% | 0.0% | 1.0 |
+| triton_nobatch | 40 | 41 | 89 | 99.8% | 0.0% | 1.0 |
+| triton_nobatch | **60** | 54 | **148** | 99.8% | 0.0% | 1.0 |
+| triton_nobatch | 80 | 1648 | 12497 | 1.0% | 0.0% | 1.0 |
+| triton_batch | 10 | 39 | 111 | 99.2% | 0.0% | 1.06 |
+| triton_batch | 20 | 47 | 145 | 99.8% | 0.0% | 1.18 |
+| triton_batch | **40** | 127 | **241** | 99.0% | 0.0% | 1.72 |
+| triton_batch | 60 | 220 | 383 | 83.6% | 0.0% | 3.34 |
+
+Capacity limits (last point within SLA): fastapi_cpu 10 req/s, fastapi_gpu 60 req/s, triton_nobatch 60 req/s, triton_batch 40 req/s.
+
+#### 1x load (60 req/s)
+
+| Arm | p50 ms | p95 ms | p99 ms | Goodput req/s | Within SLA | Error rate | Mean batch |
+|---|---|---|---|---|---|---|---|
+| fastapi_cpu | 3508 | 3670 | 3716 | 0.04 | 0.1% | 69.7% | |
+| fastapi_gpu | 112 | 402 | 482 | 51.8 | 85.0% | 0.0% | |
+| triton_nobatch | 54 | 177 | 237 | 60.8 | 99.8% | 0.0% | 1.0 |
+| triton_batch | 323 | 8024 | 13057 | 28.7 | 47.2% | 0.0% | 3.13 |
+
+#### 2x load (120 req/s)
+
+All arms collapsed at 2x with goodput near zero and error rates of 45% to 53%: fastapi_cpu 45.5%, fastapi_gpu 53.2%, triton_nobatch 46.0%, triton_batch 45.1%. The SLA-mode gateway's admission control (results section 3) is what prevents this in the real deployment.
+
+#### What the numbers say
+
+Five observations. First, moving the same ONNX file from CPU to GPU raised capacity 6x (10 to 60 req/s). Second, Triton without batching but with two model instances gave the best latency at 60 req/s: p95 148 ms in the sweep and 177 ms in the 1x run, 99.8% within SLA. This beats the FastAPI GPU server's 230 ms (sweep) and 402 ms (1x run, 85% within SLA) because two instances let one request's image decoding overlap another's inference. Third, dynamic batching made things worse here. The batcher only formed batches of 1.72 to 3.34 at 40 to 60 req/s, and because decode and resize of each image in the batch run one after another inside the Python backend before the single ONNX Runtime call, a batch of three costs three decodes of latency for one GPU call that was already fast (ResNet-50 int8 at batch 1 is tens of milliseconds). Capacity fell to 40 req/s and p95 at 60 req/s was 383 ms (sweep) and 8024 ms (1x run, 47% within SLA). Fourth, what would make batching pay: preprocessing outside the model (send tensors, or decode on the client or gateway), larger loads where batches of 8 to 32 form, or a compute-bound model (the C++ server project showed the same CPU-side effect). Fifth, the measurement limits: everything (load generator, gateway, servers) on one 4-CPU box, single runs per point.
+
 ## Engineering findings
 
 **ONNX Runtime's thread pool spins, and CPU limits punish it.** By default ORT worker threads
@@ -432,6 +476,12 @@ probe returns in under 150 ms before starting, and every point is repeated with 
 **Quantize where it helps.** Static int8 gave ResNet-50 1.5–1.7× lower latency for 0.3–1.3 points,
 and MobileNetV3 almost nothing for 4 points. The Core ML results show the other side: weight-only int8
 shrinks the model but cannot speed up compute.
+
+**Batching amplified latency when preprocessing was in-loop.** Triton's dynamic batcher formed small
+batches (1.72–3.34) at 40–60 req/s. The Python backend decoded and resized each image serially before
+calling ONNX Runtime once per batch, so a batch of three cost three image-decode latencies. The no-batch
+arm's two instances overlapped image decoding with inference, achieving p95 148 ms at 60 req/s vs 8,024 ms
+for the batching arm, which capacity-limited at 40 req/s vs 60.
 
 ## Methodology
 
@@ -457,6 +507,7 @@ shrinks the model but cannot speed up compute.
 | CPU only | GPU tiers, batching in the model server (dynamic batching changes the queueing model) |
 | HPA scales on CPU, which stops just under saturation | Scale on a gateway metric (queue depth or fast-tier share) through a custom-metrics adapter |
 | Scale-down drain is a fixed 5 s `preStop` sleep | A hook that stops accepting and waits for the queue to empty |
+| Triton measured through its Python backend on one T4 without Kubernetes | Native onnxruntime backend and GPU Kubernetes |
 
 ## Running it
 
@@ -476,6 +527,9 @@ make gke-up GCP_PROJECT=<id>   # GKE Standard cluster with node autoscaling, ima
 make gke-run       # the 4x spike experiment; then `make gke-down` deletes the cluster
 make coreml        # Core ML conversion + on-device benchmark (macOS)
 make power         # energy per inference with powermetrics (macOS, needs sudo)
+python scripts/run_on_kaggle.py --user <kaggle-username>  # Triton comparison on Kaggle T4; results/triton_load.json
+python -m triton.serve --model-dir models/artifacts/resnet50_v2_int8 --name resnet50_v2_int8  # serve model locally
+# Gateway: ACCURATE_PROTOCOL=triton ACCURATE_MODEL=resnet50_v2_int8 ACCURATE_URL=http://localhost:8000
 ```
 
 Try it by hand once the stack is up:
@@ -493,13 +547,16 @@ src/gateway/         routing.py (per-request decision) · controller.py (SLA con
                      breaker.py · canary.py · stats.py (rolling windows) · config.py · app.py
 src/modelserver/     ONNX Runtime FastAPI server, preprocess.py (Pillow + NumPy)
 src/tracing/         OpenTelemetry setup shared by both services
+src/triton/          serve.py (PyTriton model server)
 models/              export.py (ONNX + int8) · evaluate.py · dataset.py · coreml_bench.py · power_bench.py
-loadtest/            loadgen.py (open-loop) · experiments.py · k8s_hpa.py · gke_experiment.py · charts.py · locustfile.py
+loadtest/            loadgen.py (open-loop) · experiments.py · k8s_hpa.py · gke_experiment.py · triton_experiment.py · charts.py · locustfile.py
 deploy/              registry.yaml (tiers + tuning) · prometheus/ · grafana/ · k8s/ (kind, HPA, jobs) · gke/ (GKE stack + loadgen job)
 docker/              builder, modelserver, gateway, loadgen images
 tests/               34 tests
 results/             every number in this README, plus per-request CSVs under results/raw/
 report/figures/      the charts
+kaggle/              run_triton.py (Triton experiment on Kaggle)
+scripts/             run_on_kaggle.py (Kaggle job launcher)
 ```
 
 ## Author
