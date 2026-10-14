@@ -499,6 +499,8 @@ for the batching arm, which capacity-limited at 40 req/s vs 60.
 
 ## Limitations and future work
 
+- TensorRT-LLM was tried as a further tier on the free T4 and could not generate: its attention kernels are not built for Turing (sm_75). The attempt and the exact errors are in `docs/tensorrt-llm-on-t4.md`; nothing TensorRT-LLM related is claimed.
+
 | Limitation | Next step |
 |---|---|
 | One gateway process; its in-memory state is not shared | Multiple gateway replicas with a shared view (or per-replica limits, which the AIMD design already tolerates) |
